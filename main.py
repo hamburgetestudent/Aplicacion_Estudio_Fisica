@@ -1,37 +1,51 @@
 import tkinter as tk
-from tkinter import scrolledtext, messagebox, filedialog
+from tkinter import messagebox, filedialog
+import customtkinter as ctk
 import pandas as pd
 import io
 import os
 from pdf_builder import generate_pdf
 
+# Set appearance and theme
+ctk.set_appearance_mode("Dark")
+ctk.set_default_color_theme("blue")
+
 class FormulaApp:
     def __init__(self, root):
         self.root = root
         self.root.title("Generador de Fórmulas Física PDF")
-        self.root.geometry("800x600")
+        self.root.geometry("900x700")
+
+        # Configure grid layout for the root window
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(1, weight=1) # Text area expands
 
         # Instructions
-        instruction_text = "Pegue aquí sus datos (Formato: Concepto;Fórmula;Variables;Unidades (SI)):"
-        tk.Label(self.root, text=instruction_text, anchor="w").pack(fill="x", padx=10, pady=5)
+        # Original: "Pegue aquí sus datos (Formato: Concepto;Fórmula;Variables;Unidades (SI)):"
+        # Updated text to mention Markdown as well, but kept simple layout.
+        instruction_text = "Pegue aquí sus datos (Formato: Concepto;Fórmula;Variables;Unidades (SI)) o use formato Markdown:"
+        self.instr_label = ctk.CTkLabel(self.root, text=instruction_text, anchor="w", text_color="gray70")
+        self.instr_label.grid(row=0, column=0, sticky="ew", padx=20, pady=(15, 5))
 
         # Text Area
-        self.text_area = scrolledtext.ScrolledText(self.root, wrap=tk.WORD, height=20)
-        self.text_area.pack(fill="both", expand=True, padx=10, pady=5)
+        self.text_area = ctk.CTkTextbox(self.root, wrap="word", font=ctk.CTkFont(size=14))
+        self.text_area.grid(row=1, column=0, sticky="nsew", padx=20, pady=5)
 
         # Load default data if exists
         self.load_default_data()
 
         # Buttons Frame
-        btn_frame = tk.Frame(self.root)
-        btn_frame.pack(fill="x", padx=10, pady=10)
+        self.btn_frame = ctk.CTkFrame(self.root, fg_color="transparent")
+        self.btn_frame.grid(row=2, column=0, sticky="ew", padx=20, pady=20)
 
         # Generate Button
-        self.generate_btn = tk.Button(btn_frame, text="Generar PDF", command=self.generate_pdf_action, bg="#4CAF50", fg="white", font=("Arial", 12, "bold"))
+        self.generate_btn = ctk.CTkButton(self.btn_frame, text="Generar PDF", command=self.generate_pdf_action,
+                                          font=ctk.CTkFont(size=15, weight="bold"), height=40)
         self.generate_btn.pack(side="right")
         
         # Clear Button
-        self.clear_btn = tk.Button(btn_frame, text="Limpiar", command=lambda: self.text_area.delete("1.0", tk.END))
+        self.clear_btn = ctk.CTkButton(self.btn_frame, text="Limpiar", command=self.clear_text,
+                                       fg_color="transparent", border_width=2, text_color=("gray10", "#DCE4EE"), height=40)
         self.clear_btn.pack(side="left")
 
     def load_default_data(self):
@@ -42,6 +56,9 @@ class FormulaApp:
                     self.text_area.insert("1.0", content)
             except Exception as e:
                 print(f"Could not load default data: {e}")
+
+    def clear_text(self):
+        self.text_area.delete("1.0", "end")
 
     def parse_input(self, text):
         """
@@ -122,7 +139,7 @@ class FormulaApp:
         return data
 
     def generate_pdf_action(self):
-        content = self.text_area.get("1.0", tk.END).strip()
+        content = self.text_area.get("1.0", "end").strip()
         if not content:
             messagebox.showwarning("Advertencia", "El área de texto está vacía.")
             return
@@ -152,7 +169,7 @@ class FormulaApp:
             messagebox.showerror("Error", f"Ocurrió un error al generar el PDF:\n{str(e)}")
 
 def main():
-    root = tk.Tk()
+    root = ctk.CTk()
     app = FormulaApp(root)
     root.mainloop()
 
