@@ -3,11 +3,13 @@ from PyInstaller.utils.hooks import collect_all
 import os
 
 datas_ctk, binaries_ctk, hiddenimports_ctk = collect_all('customtkinter')
-datas_mpl, binaries_mpl, hiddenimports_mpl = collect_all('matplotlib')
 
-datas = datas_ctk + datas_mpl
-binaries = binaries_ctk + binaries_mpl
-hiddenimports = hiddenimports_ctk + hiddenimports_mpl
+# Removed aggressive collect_all('matplotlib') which causes test data issues
+# PyInstaller hooks for matplotlib should handle standard usage fine.
+
+datas = datas_ctk
+binaries = binaries_ctk
+hiddenimports = hiddenimports_ctk
 
 a = Analysis(
     ['src/main.py'],
@@ -18,7 +20,8 @@ a = Analysis(
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[],
+    # Exclude unnecessary accumulation of tests and Qt bindings
+    excludes=['matplotlib.tests', 'numpy.random._examples', 'PyQt5', 'PySide2', 'PySide6'],
     noarchive=False,
     optimize=0,
 )
