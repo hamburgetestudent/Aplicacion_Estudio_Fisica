@@ -3,6 +3,7 @@ from tkinter import messagebox, filedialog
 import customtkinter as ctk
 from views.pdf_view import PDFGeneratorView
 from views.quiz_view import QuizView
+from views.home_view import HomeView
 from utils import load_config
 
 # Set appearance and theme (Global)
@@ -22,18 +23,31 @@ class FormulaApp:
         self.root.grid_rowconfigure(0, weight=1)
 
         # --- Sidebar ---
-        self.sidebar_frame = ctk.CTkFrame(self.root, width=200, corner_radius=0)
+        self.sidebar_frame = ctk.CTkFrame(self.root, width=220, corner_radius=0)
         self.sidebar_frame.grid(row=0, column=0, sticky="nsew")
-        self.sidebar_frame.grid_rowconfigure(4, weight=1)
+        self.sidebar_frame.grid_rowconfigure(5, weight=1)
 
-        self.logo_label = ctk.CTkLabel(self.sidebar_frame, text="Menú", font=ctk.CTkFont(size=20, weight="bold"))
-        self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 10))
+        self.logo_label = ctk.CTkLabel(self.sidebar_frame, text="Dashboard", font=ctk.CTkFont(size=20, weight="bold"))
+        self.logo_label.grid(row=0, column=0, padx=20, pady=(20, 20))
 
-        self.btn_gen = ctk.CTkButton(self.sidebar_frame, text="Generador PDF", command=self.show_generator_view)
-        self.btn_gen.grid(row=1, column=0, padx=20, pady=10)
+        # Common button style
+        btn_kwargs = {
+            "height": 40,
+            "anchor": "w",
+            "font": ctk.CTkFont(size=16),
+            "fg_color": "transparent",
+            "text_color": ("gray10", "gray90"),
+            "hover_color": ("gray70", "gray30")
+        }
 
-        self.btn_quiz = ctk.CTkButton(self.sidebar_frame, text="Quiz / Estudio", command=self.show_quiz_view)
-        self.btn_quiz.grid(row=2, column=0, padx=20, pady=10)
+        self.btn_home = ctk.CTkButton(self.sidebar_frame, text="🏠  Inicio", command=self.show_home_view, **btn_kwargs)
+        self.btn_home.grid(row=1, column=0, padx=20, pady=10, sticky="ew")
+
+        self.btn_gen = ctk.CTkButton(self.sidebar_frame, text="📄  Generador PDF", command=self.show_generator_view, **btn_kwargs)
+        self.btn_gen.grid(row=2, column=0, padx=20, pady=10, sticky="ew")
+
+        self.btn_quiz = ctk.CTkButton(self.sidebar_frame, text="🎓  Quiz / Estudio", command=self.show_quiz_view, **btn_kwargs)
+        self.btn_quiz.grid(row=3, column=0, padx=20, pady=10, sticky="ew")
 
         # --- Main Content Area ---
         self.main_frame = ctk.CTkFrame(self.root, corner_radius=0, fg_color="transparent")
@@ -46,7 +60,7 @@ class FormulaApp:
         self.top_bar = ctk.CTkFrame(self.main_frame, height=40, fg_color="transparent")
         self.top_bar.grid(row=0, column=0, sticky="ew", padx=10, pady=5)
 
-        self.toggle_btn = ctk.CTkButton(self.top_bar, text="☰", width=40, command=self.toggle_sidebar)
+        self.toggle_btn = ctk.CTkButton(self.top_bar, text="☰", width=40, command=self.toggle_sidebar, fg_color="transparent", text_color=("gray10", "gray90"), hover_color=("gray70", "gray30"))
         self.toggle_btn.pack(side="left")
 
         # Content Container
@@ -57,11 +71,12 @@ class FormulaApp:
 
         # Views
         self.views = {}
+        self.views["home"] = HomeView(self.content_container, on_navigate=self.show_view)
         self.views["generator"] = PDFGeneratorView(self.content_container)
         self.views["quiz"] = QuizView(self.content_container)
 
         # Show default
-        self.show_generator_view()
+        self.show_home_view()
         self.sidebar_visible = True
 
     def show_view(self, name):
@@ -69,8 +84,13 @@ class FormulaApp:
         for view in self.views.values():
             view.grid_forget()
 
+        # Update Sidebar State (Visual Indication optional, keeping simple for now)
+
         # Show selected
         self.views[name].grid(row=0, column=0, sticky="nsew")
+
+    def show_home_view(self):
+        self.show_view("home")
 
     def show_generator_view(self):
         self.show_view("generator")
