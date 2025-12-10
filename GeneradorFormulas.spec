@@ -29,7 +29,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='GeneradorFormulas',
+    name=f"GeneradorFormulas_{os.environ.get('EXE_SUFFIX', 'v2')}",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

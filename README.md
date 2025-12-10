@@ -12,6 +12,21 @@ La aplicación cuenta con una interfaz gráfica moderna (CustomTkinter) y render
 *   **Generación de PDF**: Crea documentos PDF estructurados y listos para imprimir.
 *   **Portabilidad**: Puede ser empaquetado como un ejecutable único.
 
+
+## Compilación Automática y Manual
+
+Se han incluido scripts para facilitar la generación del ejecutable `.exe`:
+
+### Manualmente
+Ejecuta el archivo `build.bat` (doble clic). Esto creará una nueva versión del programa en la carpeta `dist/`.
+
+### Automáticamente (Watch Mode)
+Ejecuta el script `auto_build.py`:
+```bash
+python auto_build.py
+```
+Este script se quedará corriendo en una terminal y monitoreará cambios en tus archivos `.py` y `.spec`. Apenas guardes un cambio en tu código, reconstruirá el `.exe` automáticamente.
+
 ## Estructura del Proyecto
 
 El código fuente está organizado de la siguiente manera:
