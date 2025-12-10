@@ -15,6 +15,17 @@ ctk.set_default_color_theme("blue")
 
 import sys
 
+def get_external_path(filename):
+    """ Get absolute path to resource, looking in the executable folder first """
+    if getattr(sys, 'frozen', False):
+        # Running as compiled exe
+        base_path = os.path.dirname(sys.executable)
+    else:
+        # Running as script
+        base_path = os.path.abspath(".")
+    
+    return os.path.join(base_path, filename)
+
 def resource_path(relative_path):
     """ Get absolute path to resource, works for dev and for PyInstaller """
     try:
@@ -24,6 +35,28 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+def load_config():
+    """ Load configuration from external JSON file """
+    import json
+    config_path = get_external_path("config.json")
+    default_config = {
+        "quiz_formula_fontsize": 28,
+        "quiz_formula_dpi": 100,
+        "quiz_formula_scale": 0.9,
+        "ui_theme": "Dark",
+        "ui_color_theme": "blue"
+    }
+    
+    if os.path.exists(config_path):
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                external_config = json.load(f)
+                default_config.update(external_config)
+        except Exception as e:
+            print(f"Error loading config: {e}")
+            
+    return default_config
 
 class PDFGeneratorView(ctk.CTkFrame):
     """
@@ -63,14 +96,17 @@ class PDFGeneratorView(ctk.CTkFrame):
         self.load_default_data()
 
     def load_default_data(self):
-        file_path = resource_path("input_data.csv")
+        # 1. Try external file (next to exe)
+        external_path = get_external_path("input_data.csv")
+        file_path = external_path if os.path.exists(external_path) else resource_path("input_data.csv")
+        
         if os.path.exists(file_path):
             try:
                 with open(file_path, "r", encoding="utf-8") as f:
                     content = f.read()
                     self.text_area.insert("1.0", content)
             except Exception as e:
-                print(f"Could not load default data: {e}")
+                print(f"Could not load default data from {file_path}: {e}")
 
     def clear_text(self):
         self.text_area.delete("1.0", "end")
@@ -219,7 +255,24 @@ class QuizView(ctk.CTkFrame):
         self.next_btn.grid(row=4, column=0, pady=20)
 
         # Start first question
+        self.load_quiz_data()
         self.load_question()
+
+    def load_quiz_data(self):
+        import json
+        global QUIZ_DATA
+        
+        # Check for external JSON file
+        external_path = get_external_path("quiz_data.json")
+        if os.path.exists(external_path):
+            try:
+                with open(external_path, "r", encoding="utf-8") as f:
+                    external_data = json.load(f)
+                    if external_data:
+                        QUIZ_DATA = external_data
+                        print(f"Loaded external quiz data from {external_path}")
+            except Exception as e:
+                print(f"Failed to load external quiz data: {e}")
 
     def get_formula_image(self, latex):
         if latex in self.cached_images:
@@ -227,13 +280,21 @@ class QuizView(ctk.CTkFrame):
 
         # Render
         # Increased fontsize and scale to make formulas bigger within the button
-        buf = render_formula_to_image(latex, fontsize=28, dpi=100, text_color='white')
+        config = load_config()
+        fontsize = config.get("quiz_formula_fontsize", 28)
+        dpi = config.get("quiz_formula_dpi", 100)
+        
+        buf = render_formula_to_image(latex, fontsize=fontsize, dpi=dpi, text_color='white')
         if buf:
             pil_img = Image.open(buf)
             # Create CTkImage
             # We scale it slightly for better visibility
             w, h = pil_img.size
-            scale = 0.9 # Reduce huge dpi size to UI size
+            
+            # Load config for scale
+            config = load_config()
+            scale = config.get("quiz_formula_scale", 0.9)
+            
             ctk_img = ctk.CTkImage(light_image=pil_img, dark_image=pil_img, size=(w*scale, h*scale))
             self.cached_images[latex] = ctk_img
             return ctk_img
