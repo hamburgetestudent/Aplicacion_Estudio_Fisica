@@ -85,11 +85,6 @@ class QuizView(ctk.CTkFrame):
         # Display keys of current dictionary
         row_idx = 0
 
-        # Check if we are at leaf level (Topic) or Node level
-        # If the values are dicts containing 'formulas' or 'questions', we are at Topic level?
-        # No, the structure is Subject -> Category -> Topic -> {formulas:[], questions:[]}
-        # So if the value has "formulas" key, we are at a Topic.
-
         keys = list(self.current_selection_data.keys())
 
         for key in keys:
@@ -206,49 +201,71 @@ class QuizView(ctk.CTkFrame):
         self.header_frame.grid(row=0, column=0, sticky="ew", padx=20, pady=10)
 
         self.back_btn = ctk.CTkButton(self.header_frame, text="← Salir", width=80,
-                                      command=self.show_selection_screen)
+                                      command=self.show_selection_screen,
+                                      fg_color="transparent", border_width=1, text_color=("gray10", "gray90"))
         self.back_btn.pack(side="left")
 
-        self.title_label = ctk.CTkLabel(self.header_frame, text="Quiz", font=ctk.CTkFont(size=20, weight="bold"))
+        self.title_label = ctk.CTkLabel(self.header_frame, text="Quiz", font=ctk.CTkFont(size=24, weight="bold"))
         self.title_label.pack(side="left", padx=20)
 
-        self.score_label = ctk.CTkLabel(self.header_frame, text="Puntaje: 0/0", font=ctk.CTkFont(size=16))
-        self.score_label.pack(side="right")
+        # Score & Progress
+        self.score_frame = ctk.CTkFrame(self.header_frame, fg_color="transparent")
+        self.score_frame.pack(side="right")
 
-        # Question Area
-        self.question_frame = ctk.CTkFrame(self.quiz_frame, fg_color=("gray85", "gray17"))
-        self.question_frame.grid(row=1, column=0, sticky="ew", padx=20, pady=10)
+        self.score_label = ctk.CTkLabel(self.score_frame, text="Puntaje: 0/0", font=ctk.CTkFont(size=14))
+        self.score_label.pack(side="top", anchor="e")
 
-        self.q_label_title = ctk.CTkLabel(self.question_frame, text="Pregunta:", text_color="gray")
-        self.q_label_title.pack(pady=(10,0))
+        self.progress_bar = ctk.CTkProgressBar(self.score_frame, width=150, height=10)
+        self.progress_bar.set(0)
+        self.progress_bar.pack(side="bottom", pady=5)
 
-        self.question_text = ctk.CTkLabel(self.question_frame, text="...", font=ctk.CTkFont(size=20, weight="bold"), wraplength=800)
-        self.question_text.pack(pady=10, padx=10)
+
+        # Main Card for Question
+        self.card_frame = ctk.CTkFrame(self.quiz_frame, fg_color=("white", "gray20"), corner_radius=15)
+        self.card_frame.grid(row=1, column=0, sticky="nsew", padx=40, pady=20)
+        self.card_frame.grid_columnconfigure(0, weight=1)
+        self.card_frame.grid_rowconfigure(1, weight=1) # Question
+        self.card_frame.grid_rowconfigure(2, weight=1) # Answers
+
+        # Question Title inside Card
+        self.q_label_title = ctk.CTkLabel(self.card_frame, text="Pregunta", text_color="gray", font=ctk.CTkFont(size=14, weight="bold"))
+        self.q_label_title.grid(row=0, column=0, pady=(20, 5))
+
+        # Question Text
+        self.question_text = ctk.CTkLabel(self.card_frame, text="...", font=ctk.CTkFont(size=22), wraplength=700)
+        self.question_text.grid(row=1, column=0, pady=20, padx=20)
 
         # Answers Area
-        self.answers_frame = ctk.CTkFrame(self.quiz_frame, fg_color="transparent")
-        self.answers_frame.grid(row=2, column=0, sticky="nsew", padx=20, pady=10)
+        self.answers_frame = ctk.CTkFrame(self.card_frame, fg_color="transparent")
+        self.answers_frame.grid(row=2, column=0, sticky="nsew", padx=20, pady=20)
         self.answers_frame.grid_columnconfigure((0,1), weight=1)
         self.answers_frame.grid_rowconfigure((0,1), weight=1)
 
         self.answer_buttons = []
         for i in range(4):
             btn = ctk.CTkButton(self.answers_frame, text="", command=lambda idx=i: self.check_answer(idx),
-                                fg_color="transparent", border_width=2, border_color=("gray70", "gray30"),
-                                hover_color=("gray90", "gray25"))
+                                fg_color="transparent", border_width=2, border_color=("gray60", "gray40"),
+                                hover_color=("gray90", "gray30"), corner_radius=10, height=60,
+                                font=ctk.CTkFont(size=16))
             btn.grid(row=i//2, column=i%2, padx=10, pady=10, sticky="nsew")
             self.answer_buttons.append(btn)
 
-        self.feedback_label = ctk.CTkLabel(self.quiz_frame, text="", font=ctk.CTkFont(size=16, weight="bold"))
-        self.feedback_label.grid(row=3, column=0, pady=10)
+        # Footer Actions
+        self.footer_frame = ctk.CTkFrame(self.quiz_frame, fg_color="transparent")
+        self.footer_frame.grid(row=3, column=0, pady=20)
 
-        self.next_btn = ctk.CTkButton(self.quiz_frame, text="Siguiente Pregunta", command=self.load_question, state="disabled")
-        self.next_btn.grid(row=4, column=0, pady=20)
+        self.feedback_label = ctk.CTkLabel(self.footer_frame, text="", font=ctk.CTkFont(size=18, weight="bold"))
+        self.feedback_label.pack(side="top", pady=10)
+
+        self.next_btn = ctk.CTkButton(self.footer_frame, text="Siguiente Pregunta", command=self.load_question,
+                                      state="disabled", font=ctk.CTkFont(size=16, weight="bold"), height=40, width=200)
+        self.next_btn.pack(side="bottom")
 
     def start_quiz(self):
         self.score = 0
         self.total_attempts = 0
         self.score_label.configure(text="Puntaje: 0/0")
+        self.progress_bar.set(0)
 
         mode_str = "Fórmulas" if self.selected_mode == "formulas" else "Preguntas"
         self.title_label.configure(text=f"{self.current_topic_name} - {mode_str}")
@@ -282,7 +299,7 @@ class QuizView(ctk.CTkFrame):
         self.feedback_label.configure(text="", text_color="white")
         self.next_btn.configure(state="disabled")
         for btn in self.answer_buttons:
-            btn.configure(state="normal", fg_color="transparent", border_color=("gray70", "gray30"), image=None, text="")
+            btn.configure(state="normal", fg_color="transparent", border_color=("gray60", "gray40"), image=None, text="")
 
         if self.selected_mode == "formulas":
             self.load_formula_question()
@@ -378,6 +395,15 @@ class QuizView(ctk.CTkFrame):
 
         self.total_attempts += 1
         self.score_label.configure(text=f"Puntaje: {self.score}/{self.total_attempts}")
+
+        # Update progress bar (simple logic: score / total attempts is not progress,
+        # but ratio. If we don't have a fixed total question number, we can use ratio or just visual feedback)
+        # Let's show success rate as progress bar for now, or just fill it up as we go?
+        # Actually, usually progress bar is for "Questions Answered / Total Questions".
+        # But here we pick random questions infinitely (presumably).
+        # Let's set it to represent the accuracy: score / total_attempts.
+        if self.total_attempts > 0:
+            self.progress_bar.set(self.score / self.total_attempts)
 
         for btn in self.answer_buttons:
             btn.configure(state="disabled")
