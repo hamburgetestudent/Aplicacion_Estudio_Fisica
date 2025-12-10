@@ -64,5 +64,47 @@ QUIZ_DATA = {
             "concepto": "Periodo (Circular Uniforme)",
             "formula": r"T = \frac{2\pi r}{v}"
         }
+    ],
+    "Dinámica": [
+        {
+            "concepto": "Segunda Ley de Newton",
+            "formula": r"\vec{F}_{net} = m\vec{a}"
+        },
+        {
+            "concepto": "Peso",
+            "formula": r"\vec{w} = m\vec{g}"
+        },
+        {
+            "concepto": "Fuerza de Fricción Cinética",
+            "formula": r"f_k = \mu_k n"
+        },
+        {
+            "concepto": "Fuerza de Fricción Estática Máxima",
+            "formula": r"f_{s,max} = \mu_s n"
+        },
+        {
+            "concepto": "Trabajo (Fuerza Constante)",
+            "formula": r"W = \vec{F} \cdot \vec{d} = Fd \cos \theta"
+        },
+        {
+            "concepto": "Energía Cinética",
+            "formula": r"K = \frac{1}{2}mv^2"
+        },
+        {
+            "concepto": "Teorema Trabajo-Energía",
+            "formula": r"W_{net} = \Delta K = K_f - K_i"
+        },
+        {
+            "concepto": "Energía Potencial Gravitacional",
+            "formula": r"U_g = mgy"
+        },
+        {
+            "concepto": "Energía Potencial Elástica",
+            "formula": r"U_el = \frac{1}{2}kx^2"
+        },
+        {
+            "concepto": "Potencia Media",
+            "formula": r"P_{avg} = \frac{\Delta W}{\Delta t}"
+        }
     ]
 }
