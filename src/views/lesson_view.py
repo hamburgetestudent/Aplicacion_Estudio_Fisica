@@ -59,6 +59,7 @@ class LessonView(ctk.CTkFrame):
         self.content_frame = ctk.CTkFrame(self, fg_color="transparent")
         self.content_frame.grid(row=1, column=0, sticky="nsew", padx=20, pady=10)
         self.content_frame.grid_columnconfigure(0, weight=1)
+        self.content_frame.grid_rowconfigure(0, weight=1) # Make sure question can expand
 
         # Question / Instruction Text
         self.question_label = ctk.CTkLabel(
@@ -68,7 +69,7 @@ class LessonView(ctk.CTkFrame):
             text_color="white",
             wraplength=800
         )
-        self.question_label.pack(pady=(20, 40))
+        self.question_label.pack(pady=(20, 20), fill="both", expand=True) # Expand by default, we'll adjust later
 
         # Visualization Area (Rocket/Code in example -> Formula/Image here)
         self.viz_frame = ctk.CTkFrame(
@@ -77,15 +78,14 @@ class LessonView(ctk.CTkFrame):
             corner_radius=16,
             height=200
         )
-        self.viz_frame.pack(fill="x", padx=40, pady=(0, 40))
-        self.viz_frame.pack_propagate(False) # Fixed height
+        # viz_frame packing is dynamic in load_next_question
 
         self.viz_label = ctk.CTkLabel(self.viz_frame, text="")
         self.viz_label.place(relx=0.5, rely=0.5, anchor="center")
 
         # Options Grid
         self.options_frame = ctk.CTkFrame(self.content_frame, fg_color="transparent")
-        self.options_frame.pack(fill="both", expand=True, padx=40, pady=20)
+        self.options_frame.pack(fill="both", expand=True, padx=40, pady=20, side="bottom") # Push to bottom of content
         self.options_frame.grid_columnconfigure((0, 1, 2), weight=1) # 3 columns for desktop
 
         self.option_buttons = []
@@ -160,16 +160,26 @@ class LessonView(ctk.CTkFrame):
         # Reset UI
         self.footer_frame.configure(fg_color="#111827", border_color="#1F2937", border_width=1) # Reset footer bg
         self.feedback_frame.pack_forget() # Hide feedback text
-        self.check_btn.configure(text="COMPROBAR", state="disabled", fg_color="#374151", text_color="#9CA3AF")
+        self.check_btn.configure(text="COMPROBAR", state="disabled", fg_color="#374151", text_color="#9CA3AF", cursor="")
 
         # Prepare Options
         options = []
         target_val = ""
+        has_visual = False
 
         if self.mode == "formulas":
             # Item is { "concepto": ..., "formula": ... }
             self.question_label.configure(text=f"¿Cuál es la fórmula para: {self.current_item['concepto']}?")
             target_val = self.current_item
+
+            # Formulas usually have visual placeholder or we can render concept?
+            # Instructions say "Detecta si el objeto pregunta tiene imagen"
+            # For formulas, we don't have an 'image' field usually, but we have a concept.
+            # Let's assume we show the big "?" as visual for formulas as before, OR
+            # if we want to follow "Conditional Layout", maybe we hide it if it's just text.
+            # But the user said "Sin Imagen": No renderices un placeholder gris vacío.
+            # In formulas mode, `viz_label` was showing "?" previously. Let's hide it to make it clean.
+            has_visual = False
 
             # Distractors
             all_formulas = self.topic_data.get("formulas", [])
@@ -177,9 +187,6 @@ class LessonView(ctk.CTkFrame):
             opts = random.sample(distractors, min(3, len(distractors))) + [target_val]
             random.shuffle(opts)
             self.current_options = opts # List of dicts
-
-            # Display
-            self.viz_label.configure(text="?", font=ctk.CTkFont(size=60), image=None)
 
             for i, btn in enumerate(self.option_buttons):
                 if i < len(opts):
@@ -201,7 +208,18 @@ class LessonView(ctk.CTkFrame):
             # Questions mode
             # Item is { "question": ..., "options": [], "correct_option": ... }
             self.question_label.configure(text=self.current_item["question"])
-            self.viz_label.configure(text="❓", font=ctk.CTkFont(size=60)) # Placeholder icon
+
+            # Check for image
+            # The current data structure doesn't seem to have 'image' field in quiz_db explicitly?
+            # But instruction says "Detecta si el objeto pregunta tiene imagen".
+            # I will check if 'image' key exists and is not None.
+            img_path = self.current_item.get("image")
+            if img_path:
+                has_visual = True
+                self.viz_label.configure(text="🖼️", font=ctk.CTkFont(size=60)) # Placeholder for actual image loading
+                # TODO: Implement actual image loading if path provided
+            else:
+                has_visual = False
 
             self.current_options = list(self.current_item["options"])
             random.shuffle(self.current_options)
@@ -213,6 +231,17 @@ class LessonView(ctk.CTkFrame):
                     btn.configure(border_color="#374151", fg_color="transparent")
                 else:
                     btn.grid_remove()
+
+        # Layout Update based on Visual
+        if has_visual:
+            self.viz_frame.pack(fill="x", padx=40, pady=(0, 40), after=self.question_label)
+            # When visual exists, question label shouldn't expand too much
+            self.question_label.pack_configure(pady=(20, 40), expand=False)
+        else:
+            self.viz_frame.pack_forget()
+            # Expand question to center it
+            self.question_label.pack_configure(pady=(20, 20), expand=True)
+
 
     def handle_select(self, idx):
         if self.feedback_shown: return
@@ -227,7 +256,8 @@ class LessonView(ctk.CTkFrame):
                 btn.configure(border_color="#374151", fg_color="transparent")
 
         # Enable Check button
-        self.check_btn.configure(state="normal", fg_color="#22D3EE", text_color="#000000", hover_color="#06B6D4")
+        # Change cursor to hand2 (pointer)
+        self.check_btn.configure(state="normal", fg_color="#22D3EE", text_color="#000000", hover_color="#06B6D4", cursor="hand2")
 
     def handle_check(self):
         if self.feedback_shown:
@@ -268,7 +298,7 @@ class LessonView(ctk.CTkFrame):
 
         # Feedback UI
         self.feedback_frame.pack(side="left", padx=40)
-        self.check_btn.configure(text="CONTINUAR")
+        self.check_btn.configure(text="CONTINUAR", cursor="hand2")
 
         if correct:
             self.footer_frame.configure(fg_color="#14532D", border_color="#22C55E") # green-900/green-500
