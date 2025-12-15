@@ -21,9 +21,9 @@ function App() {
           <Route path="pdf-generator" element={<PDFGenerator />} />
           <Route path="stats" element={<Stats />} />
           <Route path="profile" element={<Profile />} />
-        </Route>
-      </Routes>
-    </HashRouter>
+        </Route >
+      </Routes >
+    </HashRouter >
   );
 }
 
