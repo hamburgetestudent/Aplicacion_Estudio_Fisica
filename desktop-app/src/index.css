@@ -25,3 +25,26 @@ body {
 button {
   font-family: inherit;
 }
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #172554;
+  /* Un azul mucho más oscuro (Blue 950) */
+  border-radius: 10px;
+  border: 1px solid transparent;
+  /* Casi pegado al borde */
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #1e3a8a;
+  /* Un poco más claro al hover */
+}

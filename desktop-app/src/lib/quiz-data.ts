@@ -59,5 +59,23 @@ export const QUIZ_DATA: QuizData = {
                 questions: []
             }
         }
+    },
+    "Python": {
+        "Fundamentos": {
+            "Algoritmos": {
+                formulas: [],
+                questions: []
+            },
+            "Bucles": {
+                formulas: [],
+                questions: []
+            }
+        },
+        "Estructuras": {
+            "Listas": {
+                formulas: [],
+                questions: []
+            }
+        }
     }
 };
