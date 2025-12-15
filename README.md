@@ -77,4 +77,4 @@ Crea documentos profesionales con tablas de fórmulas listas para imprimir.
 Si deseas contribuir, por favor revisa el archivo `ROADMAP.md` para ver las tareas pendientes y prioridades.
 
 ## Licencia
-Este proyecto es de código abierto.
+Todos los derechos reservados.
