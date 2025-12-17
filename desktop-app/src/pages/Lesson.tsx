@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Rocket, CheckCircle, RotateCcw, ArrowLeft, AlertCircle, Bot, MoveRight, X } from 'lucide-react';
+import { Rocket, CheckCircle, RotateCcw, ArrowLeft, AlertCircle, Bot, MoveRight, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useDevMode } from '../context/DevModeContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LESSONS_DATA } from '../lib/lessons';
 
@@ -13,6 +14,7 @@ const Confetti = () => <div className="fixed inset-0 pointer-events-none z-50 fl
 export default function Lesson() {
     const navigate = useNavigate();
     const { lessonId } = useParams();
+    const { isDevMode } = useDevMode();
     const lesson = lessonId ? LESSONS_DATA[lessonId] : null;
 
     const [selectedAnswer, setSelectedAnswer] = useState<any>(null);
@@ -54,22 +56,21 @@ export default function Lesson() {
         }
     }, [isAnimating, lesson]);
 
-    // Calculate Global Progress
-    const { totalLessons, currentIndex } = useMemo(() => {
-        if (!lessonId) return { totalLessons: 1, currentIndex: 0 };
 
-        // 1. Identify Group Prefix (e.g., 'Python-Fundamentos-Algoritmos')
+    const { totalLessons, currentIndex, chain } = useMemo(() => {
+        if (!lessonId) return { totalLessons: 1, currentIndex: 0, chain: [] };
+
+        // 1. Identify Group Prefix
         const prefix = lessonId.split('-').slice(0, -1).join('-');
 
         // 2. Get all lessons in this group
         const groupLessons = Object.values(LESSONS_DATA).filter(l => l.id.startsWith(prefix));
 
         // 3. Reconstruct Chain
-        // Find the start node (no other lesson in group points to it)
         const referencedIds = new Set(groupLessons.map(l => l.nextLessonId).filter(Boolean));
         const startLesson = groupLessons.find(l => !referencedIds.has(l.id));
 
-        if (!startLesson) return { totalLessons: groupLessons.length, currentIndex: 0 };
+        if (!startLesson) return { totalLessons: groupLessons.length, currentIndex: 0, chain: [] };
 
         const chain: string[] = [];
         let current: string | undefined = startLesson.id;
@@ -77,7 +78,6 @@ export default function Lesson() {
         while (current) {
             chain.push(current);
             const currLesson = LESSONS_DATA[current];
-            // Only follow if next is in the same group (prevent jumping topics)
             if (currLesson?.nextLessonId?.startsWith(prefix)) {
                 current = currLesson.nextLessonId;
             } else {
@@ -88,7 +88,8 @@ export default function Lesson() {
         const index = chain.indexOf(lessonId);
         return {
             totalLessons: chain.length,
-            currentIndex: index !== -1 ? index : 0
+            currentIndex: index !== -1 ? index : 0,
+            chain
         };
     }, [lessonId]);
 
@@ -702,10 +703,31 @@ export default function Lesson() {
                     )}
                     {!showFeedback && <div className="text-gray-500 italic hidden sm:block">Completa el ejercicio para continuar...</div>}
 
+                    {/* Dev Mode Navigation */}
+                    {isDevMode && (
+                        <div className="flex gap-2 mr-2">
+                            <button
+                                onClick={() => currentIndex > 0 && navigate(`/lessons/${chain[currentIndex - 1]}`)}
+                                disabled={currentIndex === 0}
+                                className="p-4 rounded-xl bg-gray-800 text-purple-400 border border-purple-500/50 hover:bg-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                                title="Previous Question (Dev Mode)"
+                            >
+                                <ChevronLeft size={24} />
+                            </button>
+                            <button
+                                onClick={() => currentIndex < chain.length - 1 ? navigate(`/lessons/${chain[currentIndex + 1]}`) : setShowSummary(true)}
+                                className="p-4 rounded-xl bg-gray-800 text-purple-400 border border-purple-500/50 hover:bg-purple-900/20"
+                                title="Next Question (Dev Mode)"
+                            >
+                                <ChevronRight size={24} />
+                            </button>
+                        </div>
+                    )}
+
                     <button
                         onClick={showFeedback ? handleContinue : handleCheck}
                         disabled={(lesson.type !== 'theory' && selectedAnswer === null && userSequence.length === 0)}
-                        className={`px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 shadow-lg ${showFeedback === 'success' ? 'bg-green-500 hover:bg-green-400 text-white shadow-green-900/20' :
+                        className={`px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 shadow-lg flex-1 md:flex-none ${showFeedback === 'success' ? 'bg-green-500 hover:bg-green-400 text-white shadow-green-900/20' :
                             showFeedback === 'trap' ? 'bg-amber-500 hover:bg-amber-400 text-white shadow-amber-900/20' :
                                 showFeedback === 'error' ? 'bg-red-500 hover:bg-red-400 text-white shadow-red-900/20' :
                                     (lesson.type !== 'theory' && selectedAnswer === null && userSequence.length === 0) ? 'bg-gray-800 text-gray-600 cursor-not-allowed shadow-none' :

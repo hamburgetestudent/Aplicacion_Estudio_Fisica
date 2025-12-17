@@ -11,19 +11,23 @@ import Profile from './pages/Profile';
 const PDFGenerator = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Generador de PDF</h1><p>Próximamente</p></div>;
 const Stats = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Estadísticas</h1><p>Próximamente</p></div>;
 
+import { DevModeProvider } from './context/DevModeContext';
+
 function App() {
   return (
-    <HashRouter>
-      <Routes>
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Dashboard />} />
-          <Route path="lessons/:lessonId" element={<Lesson />} />
-          <Route path="pdf-generator" element={<PDFGenerator />} />
-          <Route path="stats" element={<Stats />} />
-          <Route path="profile" element={<Profile />} />
-        </Route >
-      </Routes >
-    </HashRouter >
+    <DevModeProvider>
+      <HashRouter>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="lessons/:lessonId" element={<Lesson />} />
+            <Route path="pdf-generator" element={<PDFGenerator />} />
+            <Route path="stats" element={<Stats />} />
+            <Route path="profile" element={<Profile />} />
+          </Route >
+        </Routes >
+      </HashRouter >
+    </DevModeProvider>
   );
 }
 
