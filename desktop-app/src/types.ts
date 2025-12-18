@@ -19,7 +19,7 @@ export interface Question {
   /** La opción correcta (debe coincidir exactamente con una de las opciones). */
   correct_option: string;
   /** El nivel de dificultad de la pregunta. */
-  difficulty: "Fácil" | "Medio" | "Difícil";
+  difficulty: 'Fácil' | 'Medio' | 'Difícil';
 }
 
 /**

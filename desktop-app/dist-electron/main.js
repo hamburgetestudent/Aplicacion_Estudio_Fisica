@@ -21,10 +21,10 @@ function createWindow() {
         titleBarOverlay: {
             color: '#1e1e1e', // Coincide con el fondo del tema oscuro
             symbolColor: '#ffffff',
-            height: 35
+            height: 35,
         },
         backgroundColor: '#1e1e1e',
-        show: false // Esperar hasta que esté listo para mostrarse para evitar un parpadeo blanco
+        show: false, // Esperar hasta que esté listo para mostrarse para evitar un parpadeo blanco
     });
     // Cargar URL o Archivo
     if (process.env.VITE_DEV_SERVER_URL) {

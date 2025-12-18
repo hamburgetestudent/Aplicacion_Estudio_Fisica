@@ -1,15 +1,193 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Rocket, CheckCircle, RotateCcw, ArrowLeft, AlertCircle, Bot, MoveRight, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import {
+  Rocket,
+  CheckCircle,
+  RotateCcw,
+  ArrowLeft,
+  AlertCircle,
+  Bot,
+  MoveRight,
+
+  X as XIcon,
+  ChevronLeft,
+  ChevronRight,
+  Bug,
+  Lightbulb,
+  Search,
+} from 'lucide-react';
 import { useDevMode } from '../context/DevModeContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LESSONS_DATA } from '../lib/lessons';
+import SnakeCelebration from '../components/SnakeCelebration';
 
 // Ayudante para efectos de confeti
-const Confetti = () => <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden">
+const Confetti = () => (
+  <div className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden">
     <div className="absolute top-0 left-1/4 animate-bounce text-4xl">🎉</div>
     <div className="absolute top-10 right-1/4 animate-bounce delay-100 text-4xl">✨</div>
     <div className="absolute bottom-1/4 left-1/3 animate-bounce delay-200 text-4xl">⭐</div>
-</div>;
+  </div>
+);
+
+/**
+ * Componente interno para el "Playground Booleano"
+ */
+const BooleanPlayground = ({ onComplete }: { onComplete: () => void }) => {
+  const [slide, setSlide] = useState(0);
+  const [lightOn, setLightOn] = useState(false);
+  const [dogAnswer, setDogAnswer] = useState<boolean | null>(null);
+
+  const nextSlide = () => setSlide((prev) => prev + 1);
+
+  return (
+    <div className="bg-gray-800 rounded-3xl p-8 border border-gray-700 shadow-2xl relative overflow-hidden min-h-[400px] flex flex-col items-center text-center">
+      {/* Indicador de Slide */}
+      <div className="absolute top-4 left-0 w-full flex justify-center gap-2">
+        {[0, 1, 2].map((i) => (
+          <div
+            key={i}
+            className={`w-16 h-1 rounded-full transition-all duration-300 ${i === slide ? 'bg-cyan-400' : 'bg-gray-700'}`}
+          ></div>
+        ))}
+      </div>
+
+      <div className="flex-1 flex flex-col justify-center w-full max-w-lg mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500" key={slide}>
+
+        {/* SLIDE 1: INTERRUPTOR */}
+        {slide === 0 && (
+          <>
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-yellow-200 to-yellow-500 mb-6">
+              Las computadoras son extremistas
+            </h2>
+            <p className="text-gray-300 text-lg mb-8 leading-relaxed">
+              No entienden de "quizás". Solo entienden <b>BLANCO</b> o <b>NEGRO</b>.
+              <br />
+              <span className="text-sm opacity-70">(Como este interruptor)</span>
+            </p>
+
+            <div className="bg-gray-900/50 p-8 rounded-2xl border border-gray-700 flex flex-col items-center gap-6 mb-8 transform hover:scale-105 transition-transform duration-300">
+              <Lightbulb
+                size={80}
+                className={`transition-all duration-300 drop-shadow-lg ${lightOn ? 'text-yellow-400 fill-yellow-400 drop-shadow-[0_0_30px_rgba(250,204,21,0.6)]' : 'text-gray-600'}`}
+              />
+              <button
+                onClick={() => setLightOn(!lightOn)}
+                className={`w-24 h-12 rounded-full p-1 transition-colors duration-300 relative flex items-center ${lightOn ? 'bg-green-500 ring-4 ring-green-500/20' : 'bg-gray-600'}`}
+              >
+                <div
+                  className={`bg-white w-10 h-10 rounded-full shadow-md transform transition-transform duration-300 ${lightOn ? 'translate-x-12' : 'translate-x-0'}`}
+                ></div>
+              </button>
+              <div className="font-mono font-bold text-xl uppercase tracking-widest transition-colors duration-300">
+                {lightOn ? <span className="text-green-400">Encendido (ON)</span> : <span className="text-gray-500">Apagado (OFF)</span>}
+              </div>
+            </div>
+
+            <button
+              onClick={nextSlide}
+              className="mt-auto py-3 px-8 bg-white text-gray-900 rounded-full font-bold hover:bg-gray-200 transition-colors shadow-lg shadow-white/10 flex items-center gap-2 mx-auto"
+            >
+              Entendido <ChevronRight size={20} />
+            </button>
+          </>
+        )}
+
+        {/* SLIDE 2: DETECTIVE */}
+        {slide === 1 && (
+          <>
+            <div className="w-16 h-16 bg-purple-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-purple-500/30">
+              <Search size={32} className="text-purple-400" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">La Gran Pregunta</h2>
+            <p className="text-gray-400 mb-8">
+              Para tomar una decisión, la computadora hace una pregunta de Sí o No.
+            </p>
+
+            <div className="bg-white/5 p-6 rounded-2xl border border-white/10 mb-8 relative group">
+              <div className="absolute -top-3 -right-3 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-md transform rotate-12 shadow-sm">
+                EVIDENCIA #1
+              </div>
+              <div className="text-6xl mb-4 transform group-hover:scale-110 transition-transform duration-300">🍎</div>
+              <h3 className="text-xl font-bold text-white mb-4">"¿Es esto un perro?"</h3>
+
+              <div className="grid grid-cols-2 gap-4">
+                <button
+                  onClick={() => setDogAnswer(true)}
+                  className={`p-4 rounded-xl border-2 font-bold transition-all ${dogAnswer === true ? 'border-red-500 bg-red-500/20 text-red-300' : 'border-gray-600 hover:border-gray-500 text-gray-300'}`}
+                >
+                  Sí, claro.
+                </button>
+                <button
+                  onClick={() => setDogAnswer(false)}
+                  className={`p-4 rounded-xl border-2 font-bold transition-all ${dogAnswer === false ? 'border-green-500 bg-green-500/20 text-green-300' : 'border-gray-600 hover:border-gray-500 text-gray-300'}`}
+                >
+                  No, es fruta.
+                </button>
+              </div>
+
+              {/* Feedback Inmediato */}
+              {dogAnswer !== null && (
+                <div className={`mt-4 p-3 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${dogAnswer === false ? 'bg-green-900/50 text-green-400' : 'bg-red-900/50 text-red-400'}`}>
+                  {dogAnswer === false ? <CheckCircle size={16} /> : <XIcon size={16} />}
+                  <span>
+                    {dogAnswer === false ? "¡Correcto! Es FALSO." : "Piénsalo otra vez..."}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {dogAnswer === false && (
+              <button
+                onClick={nextSlide}
+                className="py-3 px-8 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-full font-bold hover:shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all shadow-lg flex items-center gap-2 mx-auto animate-bounce"
+              >
+                Siguiente <ChevronRight size={20} />
+              </button>
+            )}
+          </>
+        )}
+
+        {/* SLIDE 3: BOOLEANOS */}
+        {slide === 2 && (
+          <>
+            <h2 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-200 to-blue-500 mb-4">
+              Booleanos
+            </h2>
+            <p className="text-gray-300 mb-8">
+              Tu nueva palabra favorita. Son las únicas dos respuestas posibles en el mundo digital.
+            </p>
+
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="bg-green-900/20 border border-green-500/30 p-6 rounded-2xl flex flex-col items-center gap-2">
+                <CheckCircle size={40} className="text-green-500 mb-2" />
+                <span className="text-2xl font-mono font-bold text-white">True</span>
+                <span className="text-xs text-green-300 uppercase tracking-widest">Verdadero / SÍ / 1</span>
+              </div>
+              <div className="bg-red-900/20 border border-red-500/30 p-6 rounded-2xl flex flex-col items-center gap-2">
+                <XIcon size={40} className="text-red-500 mb-2" />
+                <span className="text-2xl font-mono font-bold text-white">False</span>
+                <span className="text-xs text-red-300 uppercase tracking-widest">Falso / NO / 0</span>
+              </div>
+            </div>
+
+            <div className="bg-blue-900/20 p-4 rounded-xl mb-8 border border-blue-500/30 text-blue-200 text-sm">
+              <p>Las computadoras usan <b>Booleanos</b> para decidir qué camino tomar en el código.</p>
+            </div>
+
+            <button
+              onClick={onComplete}
+              className="w-full py-4 bg-white text-gray-900 rounded-2xl font-bold text-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-white/20 flex items-center justify-center gap-3"
+            >
+              ¡Vamos a probarlo! <Bot size={24} className="text-purple-600" />
+            </button>
+          </>
+        )}
+
+      </div>
+    </div>
+  );
+};
+
 
 /**
  * Componente principal para visualizar una lección.
@@ -19,722 +197,972 @@ const Confetti = () => <div className="fixed inset-0 pointer-events-none z-50 fl
  * @returns {JSX.Element} La interfaz de usuario de la lección activa.
  */
 export default function Lesson() {
-    const navigate = useNavigate();
-    const { lessonId } = useParams();
-    const { isDevMode } = useDevMode();
-    const lesson = lessonId ? LESSONS_DATA[lessonId] : null;
+  const navigate = useNavigate();
+  const { lessonId } = useParams();
+  const { isDevMode } = useDevMode();
+  const lesson = lessonId ? LESSONS_DATA[lessonId] : null;
 
-    // Estados para la interacción del usuario
-    const [selectedAnswer, setSelectedAnswer] = useState<any>(null);
-    const [userSequence, setUserSequence] = useState<string[]>([]); // Para drag_drop
-    const [inlineAnswers, setInlineAnswers] = useState<Record<number, boolean | null>>({}); // Para bloques true_false
-    const [showFeedback, setShowFeedback] = useState<'success' | 'error' | 'trap' | null>(null);
-    const [rocketPos, setRocketPos] = useState(0);
-    const [isAnimating, setIsAnimating] = useState(false);
-    const [showSummary, setShowSummary] = useState(false); // Nuevo: Mostrar pantalla de resumen
+  // Estados para la interacción del usuario
+  const [selectedAnswer, setSelectedAnswer] = useState<any>(null);
+  const [userSequence, setUserSequence] = useState<string[]>([]); // Para drag_drop
+  const [inlineAnswers, setInlineAnswers] = useState<Record<number, boolean | null>>({}); // Para bloques true_false
+  const [showFeedback, setShowFeedback] = useState<'success' | 'error' | 'trap' | null>(null);
+  const [rocketPos, setRocketPos] = useState(0);
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showSummary, setShowSummary] = useState(false); // Nuevo: Mostrar pantalla de resumen
 
-    // Seguimiento de estadísticas
-    const startTimeRef = useState(Date.now())[0]; // Constante para este montaje
-    const [mistakes, setMistakes] = useState(0);
+  // Seguimiento de estadísticas
+  const startTimeRef = useState(Date.now())[0]; // Constante para este montaje
+  const [mistakes, setMistakes] = useState(0);
 
+  // Reiniciar estado cuando cambia la lección
+  useEffect(() => {
+    setSelectedAnswer(null);
+    setUserSequence([]);
+    setInlineAnswers({});
+    setShowFeedback(null);
+    setRocketPos(0);
+    setIsAnimating(false);
+  }, [lessonId]);
 
-    // Reiniciar estado cuando cambia la lección
-    useEffect(() => {
-        setSelectedAnswer(null);
-        setUserSequence([]);
-        setInlineAnswers({});
-        setShowFeedback(null);
-        setRocketPos(0);
-        setIsAnimating(false);
-    }, [lessonId]);
+  // Simulación de animación del cohete
+  useEffect(() => {
+    if (isAnimating && lesson?.type === 'simulation') {
+      const interval = setInterval(() => {
+        setRocketPos((prev) => {
+          if (prev >= 100) {
+            setIsAnimating(false);
+            return 100;
+          }
+          return prev + 2;
+        });
+      }, 50);
+      return () => clearInterval(interval);
+    }
+  }, [isAnimating, lesson]);
 
-    // Simulación de animación del cohete
-    useEffect(() => {
-        if (isAnimating && lesson?.type === 'simulation') {
-            const interval = setInterval(() => {
-                setRocketPos((prev) => {
-                    if (prev >= 100) {
-                        setIsAnimating(false);
-                        return 100;
-                    }
-                    return prev + 2;
-                });
-            }, 50);
-            return () => clearInterval(interval);
+  // Efectos de sonido
+  useEffect(() => {
+    if (showFeedback === 'success') {
+      const audio = new Audio('/sounds/Sonido_positivo.mp3');
+      audio.volume = 0.5;
+      audio.play().catch((e) => console.error('Error al reproducir sonido positivo:', e));
+    } else if (showFeedback === 'error') {
+      const audio = new Audio('/sounds/Sonido_negativo.mp3');
+      audio.volume = 0.5;
+      audio.play().catch((e) => console.error('Error al reproducir sonido negativo:', e));
+    }
+  }, [showFeedback]);
+
+  // Calcular progreso global en la secuencia de lecciones
+  const { totalLessons, currentIndex, chain } = useMemo(() => {
+    if (!lessonId) return { totalLessons: 1, currentIndex: 0, chain: [] };
+
+    // 1. Identificar prefijo del grupo (ej: 'Python-Fundamentos-Algoritmos')
+    const prefix = lessonId.split('-').slice(0, -1).join('-');
+
+    // 2. Obtener todas las lecciones de este grupo
+    const groupLessons = Object.values(LESSONS_DATA).filter((l) => l.id.startsWith(prefix));
+
+    // 3. Reconstruir la cadena
+    // Encontrar el nodo inicial (ninguna otra lección apunta a él)
+    const referencedIds = new Set(groupLessons.map((l) => l.nextLessonId).filter(Boolean));
+    const startLesson = groupLessons.find((l) => !referencedIds.has(l.id));
+
+    if (!startLesson) return { totalLessons: groupLessons.length, currentIndex: 0, chain: [] };
+
+    const chain: string[] = [];
+    let current: string | undefined = startLesson.id;
+
+    while (current) {
+      chain.push(current);
+      const currLesson = LESSONS_DATA[current] as any;
+      // Solo seguir si la siguiente está en el mismo grupo (prevenir saltos de tema)
+      if (currLesson && currLesson.nextLessonId && currLesson.nextLessonId.startsWith(prefix)) {
+        current = currLesson.nextLessonId;
+      } else {
+        current = undefined;
+      }
+    }
+
+    const index = chain.indexOf(lessonId);
+    return {
+      totalLessons: chain.length,
+      currentIndex: index !== -1 ? index : 0,
+      chain,
+    };
+  }, [lessonId]);
+
+  /**
+   * Valida la respuesta del usuario según el tipo de lección.
+   */
+  const handleCheck = () => {
+    if (!lesson) return;
+
+    // Validación de Teoría
+    if (lesson.type === 'theory') {
+      // Si tiene bloques interactivos (true_false), validarlos
+      const interactiveBlocks = lesson.theoryBlocks?.filter((b) => b.type === 'true_false') || [];
+      if (interactiveBlocks.length > 0) {
+        // Verificar si todas las respuestas inline son correctas
+        let allCorrect = true;
+        lesson.theoryBlocks?.forEach((block, idx) => {
+          if (block.type === 'true_false') {
+            if (inlineAnswers[idx] !== block.answer) {
+              allCorrect = false;
+            }
+          }
+        });
+
+        if (allCorrect) {
+          setShowFeedback('success');
+        } else {
+          // Podríamos establecer un mensaje de error personalizado para teoría
+          setShowFeedback('error');
         }
-    }, [isAnimating, lesson]);
+        return;
+      }
 
+      // Teoría normal (solo lectura) siempre es éxito
+      setShowFeedback('success');
+      return;
+    }
 
-    // Calcular progreso global en la secuencia de lecciones
-    const { totalLessons, currentIndex, chain } = useMemo(() => {
-        if (!lessonId) return { totalLessons: 1, currentIndex: 0, chain: [] };
+    let isCorrect = false;
+    let isTrap = false;
 
-        // 1. Identificar prefijo del grupo (ej: 'Python-Fundamentos-Algoritmos')
+    if (lesson.type === 'simulation' && lesson.simulationConfig) {
+      isCorrect = lesson.simulationConfig.verifyFunction(selectedAnswer);
+    } else if (lesson.type === 'quiz' && lesson.quizConfig) {
+      const option = lesson.quizConfig.options.find((o) => o.id === selectedAnswer);
+      isCorrect = option?.correct || false;
+    } else if (lesson.type === 'drag_drop' && lesson.dragDropConfig) {
+      // Comprobar trampa primero (si la trampa está en el índice 0)
+      if (lesson.dragDropConfig.trapId && userSequence[0] === lesson.dragDropConfig.trapId) {
+        isTrap = true;
+      } else {
+        // Comprobar coincidencia exacta de secuencia
+        const target = lesson.dragDropConfig.correctSequence;
+        if (userSequence.length !== target.length) {
+          isCorrect = false;
+        } else {
+          const match = userSequence.every((id, index) => id === target[index]);
+          if (match) {
+            isCorrect = true;
+          }
+        }
+      }
+    }
+
+    if (isTrap) {
+      setShowFeedback('trap');
+      setMistakes((prev) => prev + 1);
+    } else if (isCorrect) {
+      setShowFeedback('success');
+      if (lesson.type === 'simulation' && lesson.simulationConfig?.type === 'rocket_launch') {
+        setIsAnimating(true);
+      }
+    } else {
+      setShowFeedback('error');
+      setMistakes((prev) => prev + 1);
+    }
+  };
+
+  /**
+   * Maneja la navegación a la siguiente lección o muestra el resumen.
+   */
+  const handleContinue = () => {
+    if (!lesson) return;
+
+    if (showFeedback === 'success') {
+      const timeSpent = Date.now() - startTimeRef;
+
+      // Guardar/Actualizar estadísticas en localStorage
+      if (lessonId) {
         const prefix = lessonId.split('-').slice(0, -1).join('-');
-
-        // 2. Obtener todas las lecciones de este grupo
-        const groupLessons = Object.values(LESSONS_DATA).filter(l => l.id.startsWith(prefix));
-
-        // 3. Reconstruir la cadena
-        // Encontrar el nodo inicial (ninguna otra lección apunta a él)
-        const referencedIds = new Set(groupLessons.map(l => l.nextLessonId).filter(Boolean));
-        const startLesson = groupLessons.find(l => !referencedIds.has(l.id));
-
-        if (!startLesson) return { totalLessons: groupLessons.length, currentIndex: 0, chain: [] };
-
-        const chain: string[] = [];
-        let current: string | undefined = startLesson.id;
-
-        while (current) {
-            chain.push(current);
-            const currLesson = LESSONS_DATA[current] as any;
-            // Solo seguir si la siguiente está en el mismo grupo (prevenir saltos de tema)
-            if (currLesson && currLesson.nextLessonId && currLesson.nextLessonId.startsWith(prefix)) {
-                current = currLesson.nextLessonId;
-            } else {
-                current = undefined;
-            }
-        }
-
-        const index = chain.indexOf(lessonId);
-        return {
-            totalLessons: chain.length,
-            currentIndex: index !== -1 ? index : 0,
-            chain
-        };
-    }, [lessonId]);
-
-    /**
-     * Valida la respuesta del usuario según el tipo de lección.
-     */
-    const handleCheck = () => {
-        if (!lesson) return;
-
-        // Validación de Teoría
-        if (lesson.type === 'theory') {
-            // Si tiene bloques interactivos (true_false), validarlos
-            const interactiveBlocks = lesson.theoryBlocks?.filter(b => b.type === 'true_false') || [];
-            if (interactiveBlocks.length > 0) {
-                // Verificar si todas las respuestas inline son correctas
-                let allCorrect = true;
-                lesson.theoryBlocks?.forEach((block, idx) => {
-                    if (block.type === 'true_false') {
-                        if (inlineAnswers[idx] !== block.answer) {
-                            allCorrect = false;
-                        }
-                    }
-                });
-
-                if (allCorrect) {
-                    setShowFeedback('success');
-                } else {
-                    // Podríamos establecer un mensaje de error personalizado para teoría
-                    setShowFeedback('error');
-                }
-                return;
-            }
-
-            // Teoría normal (solo lectura) siempre es éxito
-            setShowFeedback('success');
-            return;
-        }
-
-        let isCorrect = false;
-        let isTrap = false;
-
-        if (lesson.type === 'simulation' && lesson.simulationConfig) {
-            isCorrect = lesson.simulationConfig.verifyFunction(selectedAnswer);
-        } else if (lesson.type === 'quiz' && lesson.quizConfig) {
-            const option = lesson.quizConfig.options.find(o => o.id === selectedAnswer);
-            isCorrect = option?.correct || false;
-        } else if (lesson.type === 'drag_drop' && lesson.dragDropConfig) {
-            // Comprobar trampa primero (si la trampa está en el índice 0)
-            if (lesson.dragDropConfig.trapId && userSequence[0] === lesson.dragDropConfig.trapId) {
-                isTrap = true;
-            } else {
-                // Comprobar coincidencia exacta de secuencia
-                const target = lesson.dragDropConfig.correctSequence;
-                if (userSequence.length !== target.length) {
-                    isCorrect = false;
-                } else {
-                    const match = userSequence.every((id, index) => id === target[index]);
-                    if (match) {
-                        isCorrect = true;
-                    }
-                }
-            }
-        }
-
-        if (isTrap) {
-            setShowFeedback('trap');
-            setMistakes(prev => prev + 1);
-        } else if (isCorrect) {
-            setShowFeedback('success');
-            if (lesson.type === 'simulation' && lesson.simulationConfig?.type === 'rocket_launch') {
-                setIsAnimating(true);
-            }
-        } else {
-            setShowFeedback('error');
-            setMistakes(prev => prev + 1);
-        }
-    };
-
-    /**
-     * Maneja la navegación a la siguiente lección o muestra el resumen.
-     */
-    const handleContinue = () => {
-        if (showFeedback === 'success') {
-            const timeSpent = Date.now() - startTimeRef;
-
-            // Guardar/Actualizar estadísticas en localStorage
-            if (lessonId) {
-                const prefix = lessonId.split('-').slice(0, -1).join('-');
-                const storageKey = `stats_${prefix}`;
-                let currentStats;
-                try {
-                    currentStats = JSON.parse(localStorage.getItem(storageKey) || '{"totalTime": 0, "mistakes": 0, "completed": 0}');
-                } catch {
-                    currentStats = { totalTime: 0, mistakes: 0, completed: 0 };
-                }
-
-                const newStats = {
-                    totalTime: currentStats.totalTime + timeSpent,
-                    mistakes: currentStats.mistakes + mistakes,
-                    completed: currentStats.completed + 1
-                };
-                localStorage.setItem(storageKey, JSON.stringify(newStats));
-            }
-
-            if (lesson?.nextLessonId) {
-                navigate(`/lessons/${lesson.nextLessonId}`);
-            } else {
-                // Fin del módulo - Verificar Logros
-                let currentAchievements: string[] = [];
-                try {
-                    currentAchievements = JSON.parse(localStorage.getItem('achievements') || '[]');
-                } catch {
-                    currentAchievements = [];
-                }
-
-                const newAchievements = [...currentAchievements];
-                let achievementUnlocked = false;
-
-                // 1. "Primeros Pasos" Genérico
-                if (!newAchievements.includes('first_steps')) {
-                    newAchievements.push('first_steps');
-                    achievementUnlocked = true;
-                }
-
-                // 2. "Pensamiento Algorítmico I" Específico
-                const prefix = lessonId?.split('-').slice(0, -1).join('-');
-                if (prefix === 'Python-Fundamentos-Algoritmos' && !newAchievements.includes('algo_1')) {
-                    newAchievements.push('algo_1');
-                    achievementUnlocked = true;
-                }
-
-                if (achievementUnlocked) {
-                    localStorage.setItem('achievements', JSON.stringify(newAchievements));
-                }
-
-                setShowSummary(true);
-            }
-        } else {
-            setShowFeedback(null);
-        }
-    };
-
-    /**
-     * Añade un elemento a la secuencia del usuario en ejercicios drag_drop.
-     */
-    const addToSequence = (id: string) => {
-        if (!userSequence.includes(id)) {
-            setUserSequence([...userSequence, id]);
-            setShowFeedback(null);
-        }
-    };
-
-    /**
-     * Elimina un elemento de la secuencia del usuario.
-     */
-    const removeFromSequence = (id: string) => {
-        setUserSequence(userSequence.filter(item => item !== id));
-        setShowFeedback(null);
-    };
-
-    // Calcular progreso visual basado en el tipo de lección
-    const progress = (() => {
-        if (!lesson) return 0;
-
-        let internalProgress = 0; // 0 a 1
-
-        if (lesson.type === 'theory') {
-            const interactiveBlocks = lesson.theoryBlocks?.filter(b => b.type === 'true_false') || [];
-            if (interactiveBlocks.length === 0) {
-                internalProgress = showFeedback === 'success' ? 1 : 0;
-            } else {
-                const answeredCount = Object.keys(inlineAnswers).length;
-                internalProgress = answeredCount / interactiveBlocks.length;
-            }
-        } else if (lesson.type === 'drag_drop' && lesson.dragDropConfig) {
-            const targetLength = lesson.dragDropConfig.correctSequence.length;
-            const currentLength = userSequence.length;
-            internalProgress = Math.min(1, currentLength / targetLength);
-            if (showFeedback === 'success') internalProgress = 1;
-        } else if (lesson.type === 'quiz' || lesson.type === 'simulation') {
-            if (showFeedback === 'success') internalProgress = 1;
-            // Parcial por seleccionar respuesta
-            else if (selectedAnswer !== null) internalProgress = 0.5;
-            else internalProgress = 0;
-        }
-
-        // Fórmula global
-        return Math.min(100, ((currentIndex + internalProgress) / totalLessons) * 100);
-    })();
-
-    if (showSummary) {
-        const prefix = lessonId?.split('-').slice(0, -1).join('-') || 'default';
         const storageKey = `stats_${prefix}`;
-        let stats;
+        let currentStats;
         try {
-            stats = JSON.parse(localStorage.getItem(storageKey) || '{"totalTime": 0, "mistakes": 0, "completed": 0}');
+          currentStats = JSON.parse(
+            localStorage.getItem(storageKey) || '{"totalTime": 0, "mistakes": 0, "completed": 0}'
+          );
         } catch {
-            stats = { totalTime: 0, mistakes: 0, completed: 0 };
+          currentStats = { totalTime: 0, mistakes: 0, completed: 0 };
         }
 
-        const seconds = Math.floor(stats.totalTime / 1000);
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = seconds % 60;
+        const newStats = {
+          totalTime: currentStats.totalTime + timeSpent,
+          mistakes: currentStats.mistakes + mistakes,
+          completed: currentStats.completed + 1,
+        };
+        localStorage.setItem(storageKey, JSON.stringify(newStats));
 
-        // Precisión simple: Comienza en 100%, reduce 10% por error, min 0%
-        const accuracy = Math.max(0, 100 - (stats.mistakes * 10));
+        // Guardar lección completada individualmente para el mapa de progreso
+        try {
+          const completedLessons = JSON.parse(localStorage.getItem('completed_lessons') || '[]');
+          if (Array.isArray(completedLessons) && !completedLessons.includes(lessonId)) {
+            completedLessons.push(lessonId);
+            localStorage.setItem('completed_lessons', JSON.stringify(completedLessons));
+          }
+        } catch (e) {
+          console.error('Error updating completed_lessons:', e);
+          // Fallback: overwrite if corrupt or ensure it exists as array
+          localStorage.setItem('completed_lessons', JSON.stringify([lessonId]));
+        }
+      }
 
-        return (
-            <div className="flex flex-col items-center justify-center h-full text-white animate-in zoom-in-50 duration-500">
-                <Confetti />
-                <div className="bg-gray-800/80 p-12 rounded-3xl border border-cyan-500/30 text-center max-w-lg w-full shadow-2xl backdrop-blur-xl">
-                    <div className="bg-cyan-500/20 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-6 border-4 border-cyan-400 shadow-[0_0_30px_rgba(34,211,238,0.4)]">
-                        <CheckCircle size={48} className="text-cyan-400" />
-                    </div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-cyan-300 to-white bg-clip-text text-transparent mb-2">¡Misión Cumplida!</h1>
-                    <p className="text-gray-400 mb-8">Has dominado este módulo.</p>
+      // Verificar fin de nodo/tema para mostrar celebración
+      // 1. Si no hay siguiente lección, es el final absoluto -> Mostrar Resumen
+      if (!lesson.nextLessonId) {
+        setShowSummary(true);
+        return;
+      }
 
-                    <div className="grid grid-cols-2 gap-4 mb-8">
-                        <div className="bg-gray-900/50 p-4 rounded-2xl border border-gray-700">
-                            <p className="text-gray-400 text-sm uppercase tracking-wider mb-1">Tiempo</p>
-                            <p className="text-2xl font-mono font-bold text-white">{minutes}m {remainingSeconds}s</p>
-                        </div>
-                        <div className="bg-gray-900/50 p-4 rounded-2xl border border-gray-700">
-                            <p className="text-gray-400 text-sm uppercase tracking-wider mb-1">Precisión</p>
-                            <p className={`text-2xl font-mono font-bold ${accuracy > 80 ? 'text-green-400' : accuracy > 50 ? 'text-yellow-400' : 'text-red-400'}`}>{accuracy}%</p>
-                        </div>
-                    </div>
+      // 2. Verificar si cambiamos de tema (Prefix check)
+      const currentPrefix = lessonId?.split('-').slice(0, 3).join('-');
+      const nextPrefix = lesson.nextLessonId.split('-').slice(0, 3).join('-');
 
-                    <div className="space-y-2 text-sm text-gray-400 mb-8 relative">
-                        <div className="flex justify-between border-b border-gray-700/50 pb-2">
-                            <span>Respuestas Correctas</span>
-                            <span className="text-white">{stats.completed}</span>
-                        </div>
-                        <div className="flex justify-between pt-2">
-                            <span>Errores/Reintentos</span>
-                            <span className="text-red-300">{stats.mistakes}</span>
-                        </div>
-                    </div>
+      if (currentPrefix !== nextPrefix) {
+        // Fin del tema -> Mostrar Resumen
+        setShowSummary(true);
+      } else {
+        // Siguiente lección del mismo tema -> Navegar
+        navigate(`/lessons/${lesson.nextLessonId}`);
+      }
+    } else {
+      setShowFeedback(null);
+    }
+  };
 
-                    <button
-                        onClick={() => {
-                            localStorage.removeItem(storageKey); // Limpiar estadísticas
-                            navigate('/');
-                        }}
-                        className="w-full py-4 rounded-xl font-bold text-lg bg-white text-black hover:bg-gray-200 transition-colors shadow-[0_0_20px_rgba(255,255,255,0.2)]"
-                    >
-                        Volver al Dashboard
-                    </button>
-                </div>
-            </div>
-        );
+  /**
+   * Añade un elemento a la secuencia del usuario en ejercicios drag_drop.
+   */
+  const addToSequence = (id: string) => {
+    if (!userSequence.includes(id)) {
+      setUserSequence([...userSequence, id]);
+      setShowFeedback(null);
+    }
+  };
+
+  /**
+   * Elimina un elemento de la secuencia del usuario.
+   */
+  const removeFromSequence = (id: string) => {
+    setUserSequence(userSequence.filter((item) => item !== id));
+    setShowFeedback(null);
+  };
+
+  // Calcular progreso visual basado en el tipo de lección
+  const progress = (() => {
+    if (!lesson) return 0;
+
+    let internalProgress = 0; // 0 a 1
+
+    if (lesson.type === 'theory') {
+      const interactiveBlocks = lesson.theoryBlocks?.filter((b) => b.type === 'true_false') || [];
+      if (interactiveBlocks.length === 0) {
+        internalProgress = showFeedback === 'success' ? 1 : 0;
+      } else {
+        const answeredCount = Object.keys(inlineAnswers).length;
+        internalProgress = answeredCount / interactiveBlocks.length;
+      }
+    } else if (lesson.type === 'drag_drop' && lesson.dragDropConfig) {
+      const targetLength = lesson.dragDropConfig.correctSequence.length;
+      const currentLength = userSequence.length;
+      internalProgress = Math.min(1, currentLength / targetLength);
+      if (showFeedback === 'success') internalProgress = 1;
+    } else if (lesson.type === 'quiz' || lesson.type === 'simulation') {
+      if (showFeedback === 'success') internalProgress = 1;
+      // Parcial por seleccionar respuesta
+      else if (selectedAnswer !== null) internalProgress = 0.5;
+      else internalProgress = 0;
     }
 
-    if (!lesson) {
-        return (
-            <div className="flex flex-col items-center justify-center h-full text-white">
-                <AlertCircle size={48} className="mb-4 text-red-400" />
-                <h2 className="text-2xl font-bold">Lección no encontrada</h2>
-                <button onClick={() => navigate('/')} className="mt-4 text-cyan-400 hover:underline">Volver al inicio</button>
-            </div>
-        );
+    // Fórmula global
+    return Math.min(100, ((currentIndex + internalProgress) / totalLessons) * 100);
+  })();
+
+  if (showSummary) {
+    const prefix = lessonId?.split('-').slice(0, -1).join('-') || 'default';
+    const storageKey = `stats_${prefix}`;
+    let stats;
+    try {
+      stats = JSON.parse(
+        localStorage.getItem(storageKey) || '{"totalTime": 0, "mistakes": 0, "completed": 0}'
+      );
+    } catch {
+      stats = { totalTime: 0, mistakes: 0, completed: 0 };
     }
+
+
 
     return (
-        <div className="w-full h-[calc(100vh-100px)] overflow-y-auto flex flex-col pb-40 relative" id="lesson-container">
-            {showFeedback === 'success' && <Confetti />}
-
-            {/* Cabecera de navegación */}
-            <div className="max-w-3xl mx-auto w-full px-4 pt-4">
-                <button
-                    onClick={() => navigate('/')}
-                    className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4"
-                >
-                    <ArrowLeft size={20} />
-                    <span>Salir</span>
-                </button>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <h1 className="text-2xl font-bold text-white mb-2">{lesson.title}</h1>
-                        <p className="text-gray-400 mb-6">{lesson.instructions}</p>
-                    </div>
-                    {/* Avatar de Robot para Drag Drop */}
-                    {lesson.type === 'drag_drop' && (
-                        <div className={`transition-transform duration-500 ${showFeedback === 'trap' || showFeedback === 'error' ? 'shake-animation' : ''}`}>
-                            <div className={`p-4 rounded-full border-4 ${showFeedback === 'success' ? 'bg-green-500 border-green-300' :
-                                showFeedback === 'trap' ? 'bg-amber-500 border-amber-300' :
-                                    showFeedback === 'error' ? 'bg-red-500 border-red-300' :
-                                        'bg-gray-700 border-gray-500'
-                                }`}>
-                                <Bot size={40} className="text-white" />
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col px-4">
-                {/* Barra de Progreso Dinámica */}
-                <div className="w-full h-2 bg-gray-800 rounded-full mb-8 overflow-hidden">
-                    <div
-                        className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500 ease-out"
-                        style={{ width: `${progress}%` }}
-                    ></div>
-                </div>
-
-                <div className="flex-1 flex flex-col gap-6">
-                    {/* Área de Contenido Dinámico */}
-
-                    {/* SIMULACIÓN */}
-                    {lesson.type === 'simulation' && lesson.simulationConfig && (
-                        <>
-                            <div className="bg-gray-800 rounded-xl p-8 h-64 flex items-end justify-center relative overflow-hidden border border-gray-700 shadow-inner">
-                                <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-                                {lesson.simulationConfig.type === 'rocket_launch' && (
-                                    <>
-                                        <div
-                                            className="transition-all duration-1000 ease-out absolute z-10"
-                                            style={{ bottom: `${rocketPos}%`, transform: 'translateY(50%)' }}
-                                        >
-                                            <Rocket size={64} className="text-orange-500 transform -rotate-45 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]" />
-                                            {isAnimating && <div className="absolute top-12 left-4 w-8 h-16 bg-gradient-to-b from-yellow-300 via-orange-500 to-transparent opacity-80 blur-md rounded-full animate-pulse"></div>}
-                                        </div>
-                                        <div className="absolute bottom-0 w-full h-4 bg-gradient-to-t from-purple-900 to-purple-800/50 border-t border-purple-500/30"></div>
-                                    </>
-                                )}
-                            </div>
-                            <div className="bg-[#1E1E1E] rounded-xl p-6 font-mono text-sm md:text-base border-l-4 border-cyan-500 shadow-2xl relative">
-                                <div className="absolute top-2 right-2 flex gap-1">
-                                    <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                                    <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                                    <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                                </div>
-                                <pre className="whitespace-pre-wrap font-inherit">
-                                    {lesson.simulationConfig.initialCode.split('???')[0]}
-                                    <span className="inline-block relative group">
-                                        <span className={`inline-block min-w-16 h-6 border-b-2 text-center align-middle transition-colors font-bold ${selectedAnswer !== null ? 'text-cyan-300 border-cyan-500' : 'text-gray-500 border-gray-600 border-dashed'
-                                            }`}>
-                                            {selectedAnswer !== null
-                                                ? lesson.simulationConfig.options.find(o => o.value === selectedAnswer)?.code
-                                                : '?'}
-                                        </span>
-                                        {!selectedAnswer && <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-cyan-600 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">Selecciona un valor</span>}
-                                    </span>
-                                    {lesson.simulationConfig.initialCode.split('???')[1]}
-                                </pre>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-32">
-                                {lesson.simulationConfig.options.map((opt, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => { setSelectedAnswer(opt.value); setShowFeedback(null); setRocketPos(0); setIsAnimating(false); }}
-                                        className={`p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden group ${selectedAnswer === opt.value
-                                            ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.2)]'
-                                            : 'border-gray-700 bg-gray-800/50 hover:bg-gray-800 hover:border-gray-500 text-gray-300'
-                                            }`}
-                                    >
-                                        <div className={`absolute inset-0 bg-cyan-400/5 transition-transform duration-300 origin-left ${selectedAnswer === opt.value ? 'scale-x-100' : 'scale-x-0'}`}></div>
-                                        <code className="bg-black/30 px-2 py-1 rounded text-sm block mb-2 font-bold group-hover:text-white transition-colors">{opt.code}</code>
-                                        <span className="text-xs text-gray-400 group-hover:text-gray-300">{opt.label}</span>
-                                    </button>
-                                ))}
-                            </div>
-                        </>
-                    )}
-
-                    {/* QUIZ */}
-                    {lesson.type === 'quiz' && lesson.quizConfig && (
-                        <div className="flex flex-col gap-8 items-center justify-center flex-1">
-                            <h2 className="text-3xl font-bold text-center mb-8">{lesson.quizConfig.question}</h2>
-                            <div className="grid grid-cols-1 gap-4 w-full max-w-xl">
-                                {lesson.quizConfig.options.map((option) => (
-                                    <button
-                                        key={option.id}
-                                        onClick={() => { setSelectedAnswer(option.id); setShowFeedback(null); }}
-                                        className={`p-6 rounded-2xl border-2 text-left transition-all text-xl font-medium ${selectedAnswer === option.id
-                                            ? 'border-cyan-400 bg-cyan-900/30 text-white shadow-[0_0_15px_rgba(34,211,238,0.2)]'
-                                            : 'border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-300'
-                                            }`}
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold ${selectedAnswer === option.id ? 'border-cyan-400 text-cyan-400' : 'border-gray-600 text-gray-600'
-                                                }`}>
-                                                {option.id}
-                                            </div>
-                                            <span className="whitespace-pre-line">{option.text}</span>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-
-                    {/* ARRASTRAR Y SOLTAR (DRAG AND DROP) */}
-                    {lesson.type === 'drag_drop' && lesson.dragDropConfig && (
-                        <div className="flex flex-col md:flex-row gap-8 flex-1">
-                            {/* Reserva (Pool) */}
-                            <div className="flex-1 md:border-r border-gray-800 md:pr-4">
-                                <h3 className="text-cyan-400 font-bold mb-4 uppercase text-xs tracking-wider">Pasos Disponibles</h3>
-                                <div className="space-y-3">
-                                    {lesson.dragDropConfig.items.filter(i => !userSequence.includes(i.id)).map(item => (
-                                        <button
-                                            key={item.id}
-                                            onClick={() => addToSequence(item.id)}
-                                            className="w-full p-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-left transition-all active:scale-95 flex justify-between items-center group"
-                                        >
-                                            <span className="font-medium text-gray-200">{item.text}</span>
-                                            <MoveRight size={16} className="text-gray-500 group-hover:text-cyan-400 transition-colors" />
-                                        </button>
-                                    ))}
-                                    {lesson.dragDropConfig.items.filter(i => !userSequence.includes(i.id)).length === 0 && (
-                                        <div className="text-gray-600 italic text-center py-4 text-sm">Todo asignado</div>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Secuencia */}
-                            <div className="flex-1 bg-gray-900/50 rounded-2xl p-6 border-2 border-dashed border-gray-700 min-h-[300px] shadow-inner">
-                                <h3 className="text-purple-400 font-bold mb-4 uppercase text-xs tracking-wider flex items-center gap-2">
-                                    Tu Algoritmo <span className="text-gray-600 text-[10px]">(Orden de ejecución)</span>
-                                </h3>
-                                <div className="space-y-3">
-                                    {userSequence.map((seqId, idx) => {
-                                        const item = lesson.dragDropConfig?.items.find(i => i.id === seqId);
-                                        return (
-                                            <div key={seqId} className="w-full p-4 bg-purple-900/20 border border-purple-500/30 rounded-xl flex justify-between items-center animate-in slide-in-from-left-2 fade-in duration-300">
-                                                <div className="flex items-center gap-3">
-                                                    <span className="bg-purple-900 text-purple-200 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">{idx + 1}</span>
-                                                    <span className="font-medium text-purple-100">{item?.text}</span>
-                                                </div>
-                                                <button onClick={() => removeFromSequence(seqId)} className="text-gray-400 hover:text-red-400 p-1 hover:bg-red-500/10 rounded-lg transition-colors">
-                                                    <X size={16} />
-                                                </button>
-                                            </div>
-                                        );
-                                    })}
-                                    {userSequence.length === 0 && (
-                                        <div className="text-gray-500 py-10 text-center flex flex-col items-center">
-                                            <div className="w-12 h-12 border-2 border-dashed border-gray-700 rounded-full mb-3 flex items-center justify-center text-gray-700">
-                                                <MoveRight size={20} />
-                                            </div>
-                                            <p className="text-sm">Toca los pasos disponibles<br />para añadirlos aquí</p>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* TEORÍA */}
-                    {lesson.type === 'theory' && (
-                        <div className="flex flex-col gap-6">
-                            {lesson.theoryBlocks ? (
-                                lesson.theoryBlocks.map((block, idx) => {
-                                    switch (block.type) {
-                                        case 'text':
-                                            return <p key={idx} className="text-xl text-gray-200 leading-relaxed font-medium">{block.content as string}</p>;
-                                        case 'header':
-                                            return <h3 key={idx} className="text-2xl font-bold text-cyan-400 mt-4">{block.content as string}</h3>;
-                                        case 'list':
-                                            return (
-                                                <div key={idx} className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700">
-                                                    <ul className="space-y-4">
-                                                        {(block.content as string[]).map((item, itemIdx) => (
-                                                            <li key={itemIdx} className="flex items-center gap-4 text-lg text-gray-300">
-                                                                <span className="bg-cyan-900 text-cyan-400 w-8 h-8 flex items-center justify-center rounded-full font-bold flex-shrink-0">{itemIdx + 1}</span>
-                                                                {item}
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            );
-                                        case 'checklist':
-                                            return (
-                                                <div key={idx} className="bg-gray-800/30 p-6 rounded-2xl border border-gray-700/50">
-                                                    <ul className="space-y-4">
-                                                        {(block.content as string[]).map((item, itemIdx) => (
-                                                            <li key={itemIdx} className="flex items-center gap-4 text-lg text-gray-200">
-                                                                <CheckCircle size={24} className="text-green-500 flex-shrink-0" />
-                                                                <span className="font-medium">{item}</span>
-                                                            </li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            );
-                                        case 'true_false':
-                                            const userAnswer = inlineAnswers[idx];
-                                            const isCorrect = userAnswer === block.answer;
-                                            const hasAnswered = userAnswer !== undefined && userAnswer !== null;
-
-                                            return (
-                                                <div key={idx} className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700 my-4 shadow-lg">
-                                                    <p className="text-lg font-bold text-white mb-6">{block.content as string}</p>
-
-                                                    <div className="flex gap-4">
-                                                        <button
-                                                            onClick={() => setInlineAnswers({ ...inlineAnswers, [idx]: true })}
-                                                            disabled={hasAnswered}
-                                                            className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${hasAnswered && block.answer === true ? 'bg-green-500/20 text-green-400 border-2 border-green-500' :
-                                                                hasAnswered && userAnswer === true && !isCorrect ? 'bg-red-500/20 text-red-400 border-2 border-red-500' :
-                                                                    'bg-gray-700 hover:bg-gray-600 text-gray-300 border-2 border-transparent'
-                                                                }`}
-                                                        >
-                                                            Verdadero
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setInlineAnswers({ ...inlineAnswers, [idx]: false })}
-                                                            disabled={hasAnswered}
-                                                            className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${hasAnswered && block.answer === false ? 'bg-green-500/20 text-green-400 border-2 border-green-500' :
-                                                                hasAnswered && userAnswer === false && !isCorrect ? 'bg-red-500/20 text-red-400 border-2 border-red-500' :
-                                                                    'bg-gray-700 hover:bg-gray-600 text-gray-300 border-2 border-transparent'
-                                                                }`}
-                                                        >
-                                                            Falso
-                                                        </button>
-                                                    </div>
-
-                                                    {hasAnswered && (
-                                                        <div className={`mt-4 p-3 rounded-lg text-sm font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${isCorrect ? 'text-green-400 bg-green-900/20' : 'text-red-400 bg-red-900/20'}`}>
-                                                            {isCorrect ? <CheckCircle size={16} /> : <X size={16} />}
-                                                            {isCorrect ? '¡Correcto!' : 'Incorrecto'}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        case 'alert':
-                                            return (
-                                                <div key={idx} className={`p-6 rounded-2xl border-l-8 flex gap-4 ${block.style === 'warning' ? 'bg-amber-900/20 border-amber-500 text-amber-100' : 'bg-blue-900/20 border-blue-500 text-blue-100'
-                                                    }`}>
-                                                    <AlertCircle size={32} className="flex-shrink-0" />
-                                                    <p className="font-bold text-lg">{block.content as string}</p>
-                                                </div>
-                                            );
-                                        default:
-                                            return null;
-                                    }
-                                })
-                            ) : (
-                                <div className="p-8 bg-gray-800 rounded-xl">
-                                    <h3 className="text-xl font-bold mb-4">Teoría</h3>
-                                    <p className="text-gray-300 leading-relaxed">{lesson.theoryContent}</p>
-                                </div>
-                            )}
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Pie de acción fijo (Sticky) */}
-            <div className={`fixed bottom-0 left-0 md:left-64 right-0 p-6 border-t backdrop-blur-md transition-colors duration-300 z-40 ${showFeedback === 'success' ? 'bg-green-900/90 border-green-500/50' :
-                showFeedback === 'trap' ? 'bg-amber-900/90 border-amber-500/50' :
-                    showFeedback === 'error' ? 'bg-red-900/90 border-red-500/50' :
-                        'bg-[#1e1e1e]/90 border-gray-800'
-                }`}>
-                <div className="max-w-3xl mx-auto flex justify-between items-center">
-                    {showFeedback === 'success' && (
-                        <div className="flex items-center gap-4 animate-in slide-in-from-bottom-2 duration-300">
-                            <div className="bg-green-500/20 p-2 rounded-full">
-                                <CheckCircle size={32} className="text-green-400" />
-                            </div>
-                            <div>
-                                <p className="font-bold text-green-100 text-lg">¡Correcto!</p>
-                                <p className="text-sm font-normal text-green-300/80">
-                                    {lesson.type === 'simulation' ? lesson.simulationConfig?.successMessage :
-                                        lesson.type === 'quiz' ? lesson.quizConfig?.successMessage :
-                                            lesson.type === 'drag_drop' ? lesson.dragDropConfig?.successMessage :
-                                                "Lección completada. ¡Continúa aprendiendo!"}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                    {showFeedback === 'trap' && (
-                        <div className="flex items-center gap-4 animate-in slide-in-from-bottom-2 duration-300">
-                            <div className="bg-amber-500/20 p-2 rounded-full">
-                                <Bot size={32} className="text-amber-400" />
-                            </div>
-                            <div>
-                                <p className="font-bold text-amber-100 text-lg">¡Espera!</p>
-                                <p className="text-sm font-normal text-amber-200">{lesson.dragDropConfig?.trapMessage}</p>
-                            </div>
-                        </div>
-                    )}
-                    {showFeedback === 'error' && (
-                        <div className="flex items-center gap-4 animate-in slide-in-from-bottom-2 duration-300">
-                            <div className="bg-red-500/20 p-2 rounded-full">
-                                <RotateCcw size={32} className="text-red-400" />
-                            </div>
-                            <div>
-                                <p className="font-bold text-red-100 text-lg">Inténtalo de nuevo</p>
-                                <p className="text-sm font-normal text-red-300/80">
-                                    {lesson.type === 'simulation' ? lesson.simulationConfig?.errorMessage :
-                                        lesson.type === 'quiz' ? lesson.quizConfig?.errorMessage :
-                                            lesson.type === 'drag_drop' ? lesson.dragDropConfig?.errorMessage :
-                                                "Responde correctamente todas las preguntas para continuar."}
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                    {!showFeedback && <div className="text-gray-500 italic hidden sm:block">Completa el ejercicio para continuar...</div>}
-
-                    {/* Dev Mode Navigation */}
-                    {isDevMode && (
-                        <div className="flex gap-2 mr-2">
-                            <button
-                                onClick={() => currentIndex > 0 && navigate(`/lessons/${chain[currentIndex - 1]}`)}
-                                disabled={currentIndex === 0}
-                                className="p-4 rounded-xl bg-gray-800 text-purple-400 border border-purple-500/50 hover:bg-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                                title="Previous Question (Dev Mode)"
-                            >
-                                <ChevronLeft size={24} />
-                            </button>
-                            <button
-                                onClick={() => currentIndex < chain.length - 1 ? navigate(`/lessons/${chain[currentIndex + 1]}`) : setShowSummary(true)}
-                                className="p-4 rounded-xl bg-gray-800 text-purple-400 border border-purple-500/50 hover:bg-purple-900/20"
-                                title="Next Question (Dev Mode)"
-                            >
-                                <ChevronRight size={24} />
-                            </button>
-                        </div>
-                    )}
-
-                    <button
-                        onClick={showFeedback ? handleContinue : handleCheck}
-                        disabled={(lesson.type !== 'theory' && selectedAnswer === null && userSequence.length === 0)}
-                        className={`px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 shadow-lg flex-1 md:flex-none ${showFeedback === 'success' ? 'bg-green-500 hover:bg-green-400 text-white shadow-green-900/20' :
-                            showFeedback === 'trap' ? 'bg-amber-500 hover:bg-amber-400 text-white shadow-amber-900/20' :
-                                showFeedback === 'error' ? 'bg-red-500 hover:bg-red-400 text-white shadow-red-900/20' :
-                                    (lesson.type !== 'theory' && selectedAnswer === null && userSequence.length === 0) ? 'bg-gray-800 text-gray-600 cursor-not-allowed shadow-none' :
-                                        'bg-gradient-to-b from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-cyan-950 shadow-cyan-900/30'
-                            }`}
-                    >
-                        {showFeedback ? 'CONTINUAR' : (lesson.type === 'theory' ? 'CONTINUAR' : 'COMPROBAR')}
-                    </button>
-                </div>
-            </div>
-        </div>
+      <SnakeCelebration
+        show={true}
+        stats={stats}
+        onRestart={() => {
+          localStorage.removeItem(storageKey);
+          window.location.reload();
+        }}
+        onContinue={() => {
+          localStorage.removeItem(storageKey);
+          navigate('/');
+        }}
+      />
     );
+  }
+
+  if (!lesson) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-white">
+        <AlertCircle size={48} className="mb-4 text-red-400" />
+        <h2 className="text-2xl font-bold">Lección no encontrada</h2>
+        <button onClick={() => navigate('/')} className="mt-4 text-cyan-400 hover:underline">
+          Volver al inicio
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="w-full h-[calc(100vh-100px)] overflow-y-auto flex flex-col pb-40 relative"
+      id="lesson-container"
+    >
+      {showFeedback === 'success' && <Confetti />}
+
+      {/* Cabecera de navegación */}
+      <div className="max-w-3xl mx-auto w-full px-4 pt-4">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-4"
+        >
+          <ArrowLeft size={20} />
+          <span>Salir</span>
+        </button>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-2xl font-bold text-white mb-2">{lesson.title}</h1>
+            <p className="text-gray-400 mb-6">{lesson.instructions}</p>
+          </div>
+          {/* Avatar de Robot para Drag Drop */}
+          {lesson.type === 'drag_drop' && (
+            <div
+              className={`transition-transform duration-500 ${showFeedback === 'trap' || showFeedback === 'error' ? 'shake-animation' : ''}`}
+            >
+              <div
+                className={`p-4 rounded-full border-4 ${showFeedback === 'success'
+                  ? 'bg-green-500 border-green-300'
+                  : showFeedback === 'trap'
+                    ? 'bg-amber-500 border-amber-300'
+                    : showFeedback === 'error'
+                      ? 'bg-red-500 border-red-300'
+                      : 'bg-gray-700 border-gray-500'
+                  }`}
+              >
+                <Bot size={40} className="text-white" />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col px-4">
+        {/* Barra de Progreso Dinámica */}
+        <div className="w-full h-2 bg-gray-800 rounded-full mb-8 overflow-hidden">
+          <div
+            className="h-full bg-gradient-to-r from-green-400 to-emerald-500 transition-all duration-500 ease-out"
+            style={{ width: `${progress}%` }}
+          ></div>
+        </div>
+
+        <div className="flex-1 flex flex-col gap-6">
+          {/* Área de Contenido Dinámico */}
+
+          {/* SIMULACIÓN */}
+          {lesson.type === 'simulation' &&
+            lesson.simulationConfig &&
+            !['boolean_playground', 'message_send'].includes(lesson.simulationConfig.type) && (
+              <>
+                <div className="bg-gray-800 rounded-xl p-8 h-64 flex items-end justify-center relative overflow-hidden border border-gray-700 shadow-inner">
+                  <div
+                    className="absolute inset-0 opacity-20"
+                    style={{
+                      backgroundImage:
+                        'linear-gradient(#444 1px, transparent 1px), linear-gradient(90deg, #444 1px, transparent 1px)',
+                      backgroundSize: '30px 30px',
+                    }}
+                  ></div>
+                  {lesson.simulationConfig.type === 'rocket_launch' && (
+                    <>
+                      <div
+                        className="transition-all duration-1000 ease-out absolute z-10"
+                        style={{ bottom: `${rocketPos}%`, transform: 'translateY(50%)' }}
+                      >
+                        <Rocket
+                          size={64}
+                          className="text-orange-500 transform -rotate-45 drop-shadow-[0_0_10px_rgba(249,115,22,0.5)]"
+                        />
+                        {isAnimating && (
+                          <div className="absolute top-12 left-4 w-8 h-16 bg-gradient-to-b from-yellow-300 via-orange-500 to-transparent opacity-80 blur-md rounded-full animate-pulse"></div>
+                        )}
+                      </div>
+                      <div className="absolute bottom-0 w-full h-4 bg-gradient-to-t from-purple-900 to-purple-800/50 border-t border-purple-500/30"></div>
+                    </>
+                  )}
+                </div>
+
+                {/* Generic Code Block & Options - ONLY FOR ROCKET LAUNCH */}
+                {lesson.simulationConfig.type === 'rocket_launch' && (
+                  <>
+                    <div className="bg-[#1E1E1E] rounded-xl p-6 font-mono text-sm md:text-base border-l-4 border-cyan-500 shadow-2xl relative mt-4">
+                      <div className="absolute top-2 right-2 flex gap-1">
+                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
+                      </div>
+                      <pre className="whitespace-pre-wrap font-inherit">
+                        {lesson.simulationConfig.initialCode.split('???')[0]}
+                        <span className="inline-block relative group">
+                          <span
+                            className={`inline-block min-w-16 h-6 border-b-2 text-center align-middle transition-colors font-bold ${selectedAnswer !== null
+                              ? 'text-cyan-300 border-cyan-500'
+                              : 'text-gray-500 border-gray-600 border-dashed'
+                              }`}
+                          >
+                            {selectedAnswer !== null
+                              ? lesson.simulationConfig.options.find(
+                                (o) => o.value === selectedAnswer
+                              )?.code
+                              : '?'}
+                          </span>
+                          {!selectedAnswer && (
+                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-cyan-600 text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                              Selecciona un valor
+                            </span>
+                          )}
+                        </span>
+                        {lesson.simulationConfig.initialCode.split('???')[1]}
+                      </pre>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 mb-32">
+                      {lesson.simulationConfig.options.map((opt, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => {
+                            setSelectedAnswer(opt.value);
+                            setShowFeedback(null);
+                            setRocketPos(0);
+                            setIsAnimating(false);
+                          }}
+                          className={`p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden group ${selectedAnswer === opt.value
+                            ? 'border-cyan-400 bg-cyan-950/40 text-cyan-300 shadow-[0_0_15px_rgba(34,211,238,0.2)]'
+                            : 'border-gray-700 bg-gray-800/50 hover:bg-gray-800 hover:border-gray-500 text-gray-300'
+                            }`}
+                        >
+                          <div
+                            className={`absolute inset-0 bg-cyan-400/5 transition-transform duration-300 origin-left ${selectedAnswer === opt.value ? 'scale-x-100' : 'scale-x-0'}`}
+                          ></div>
+                          <code className="bg-black/30 px-2 py-1 rounded text-sm block mb-2 font-bold group-hover:text-white transition-colors">
+                            {opt.code}
+                          </code>
+                          <span className="text-xs text-gray-400 group-hover:text-gray-300">
+                            {opt.label}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+
+                {/* Controls */}
+                <div className="bg-gray-800 p-6 rounded-xl border border-gray-700">
+                  {/* ... existing controls ... */}
+                </div>
+              </>
+            )}
+
+
+          {/* BOOLEAN PLAYGROUND SIMULATION */}
+          {lesson.type === 'simulation' && lesson.simulationConfig?.type === 'boolean_playground' && (
+            <BooleanPlayground
+              onComplete={() => {
+                setShowFeedback('success');
+                // Trigger confetti immediately without waiting for parent validation
+                setTimeout(() => {
+                  setShowFeedback('success');
+                }, 100);
+              }}
+            />
+          )}
+
+          {/* MESSAGE SEND SIMULATION (Legacy support or if needed) */}
+          {lesson.type === 'simulation' && lesson.simulationConfig?.type === 'message_send' && (
+            <div className="bg-gray-800 rounded-xl p-8 h-80 flex flex-col items-center justify-between relative overflow-hidden border border-gray-700 shadow-inner gap-4">
+              {/* Steps Appearing Animation */}
+              <div className="absolute top-4 left-4 bg-gray-900/80 p-4 rounded-lg border border-gray-700 w-48 z-20">
+                <h4 className="text-xs font-bold text-gray-500 uppercase mb-2">Ejecución</h4>
+                <ul className="space-y-2 text-sm">
+                  {[
+                    'Abrir el celular',
+                    'Abrir app mensajes',
+                    'Elegir contacto',
+                    'Escribir mensaje',
+                    'Enviar',
+                  ].map((step, idx) => {
+                    // Show step if rocketPos passed a threshold (0, 20, 40, 60, 80)
+                    const visible = rocketPos > idx * 20;
+                    const active = rocketPos > idx * 20 && rocketPos <= (idx + 1) * 20;
+
+                    return (
+                      <li
+                        key={idx}
+                        className={`flex items-center gap-2 transition-all duration-300 ${visible ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
+                      >
+                        <div
+                          className={`w-2 h-2 rounded-full ${active ? 'bg-yellow-400 animate-pulse' : 'bg-green-500'}`}
+                        ></div>
+                        <span className={active ? 'text-yellow-100' : 'text-gray-300'}>{step}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+
+              <div className="flex items-center gap-8 mt-12">
+                {/* Phone/Robot */}
+                <div
+                  className={`flex flex-col items-center transition-all duration-500 ${rocketPos > 0 ? 'opacity-100' : 'opacity-50'}`}
+                >
+                  <Bot
+                    size={48}
+                    className={`transition-colors duration-300 ${rocketPos > 0 && rocketPos < 20 ? 'text-yellow-400 scale-110' : 'text-purple-400'}`}
+                  />
+                  <span className="text-xs text-gray-400 mt-2">Robot</span>
+                </div>
+
+                {/* Arrow 1 */}
+                <MoveRight
+                  size={32}
+                  className={`text-gray-600 transition-colors duration-500 ${rocketPos > 40 ? 'text-green-400' : ''}`}
+                />
+
+                {/* Message Bubble */}
+                <div
+                  className={`px-4 py-2 bg-gray-700 rounded-lg rounded-tl-none border border-gray-600 transition-all duration-500 ${rocketPos > 60 ? 'scale-100 opacity-100' : 'scale-75 opacity-0'}`}
+                >
+                  <span className="text-sm text-cyan-300">"Hola Mundo"</span>
+                </div>
+
+                {/* Arrow 2 */}
+                <MoveRight
+                  size={32}
+                  className={`text-gray-600 transition-colors duration-500 ${rocketPos > 80 ? 'text-green-400' : ''}`}
+                />
+
+                {/* Send Button/Icon */}
+                <div
+                  className={`p-3 rounded-full border-2 transition-all duration-500 ${rocketPos >= 100 ? 'bg-green-500/20 border-green-500 text-green-400' : 'border-gray-600 text-gray-600'}`}
+                >
+                  <CheckCircle size={24} />
+                </div>
+              </div>
+
+              <div className="absolute bottom-4 text-gray-400 text-sm italic w-full text-center">
+                {rocketPos < 100
+                  ? 'El robot ejecuta tus pasos uno a uno...'
+                  : '¡Algoritmo completado!'}
+              </div>
+            </div>
+          )}
+
+          {/* QUIZ */}
+          {lesson.type === 'quiz' && lesson.quizConfig && (
+            <div className="flex flex-col gap-8 items-center justify-center flex-1">
+              <h2 className="text-3xl font-bold text-center mb-8">{lesson.quizConfig.question}</h2>
+              <div className="grid grid-cols-1 gap-4 w-full max-w-xl">
+                {lesson.quizConfig.options.map((option) => (
+                  <button
+                    key={option.id}
+                    onClick={() => {
+                      setSelectedAnswer(option.id);
+                      setShowFeedback(null);
+                    }}
+                    className={`p-6 rounded-2xl border-2 text-left transition-all text-xl font-medium relative ${selectedAnswer === option.id
+                      ? 'border-cyan-400 bg-cyan-900/30 text-white shadow-[0_0_15px_rgba(34,211,238,0.2)]'
+                      : isDevMode && option.correct
+                        ? 'border-green-500/50 bg-green-900/10 text-gray-300' // Cheat Style
+                        : 'border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-300'
+                      }`}
+                  >
+                    {isDevMode && option.correct && (
+                      <div className="absolute top-2 right-2 flex items-center gap-1 text-green-500 text-xs font-bold uppercase tracking-wider bg-green-900/30 px-2 py-1 rounded border border-green-500/30">
+                        <Bug size={12} /> Correct Answer
+                      </div>
+                    )}
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold ${selectedAnswer === option.id
+                          ? 'border-cyan-400 text-cyan-400'
+                          : isDevMode && option.correct
+                            ? 'border-green-500 text-green-500' // Cheat Style
+                            : 'border-gray-600 text-gray-600'
+                          }`}
+                      >
+                        {option.id}
+                      </div>
+                      <span className="whitespace-pre-line">{option.text}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ARRASTRAR Y SOLTAR (DRAG AND DROP) */}
+          {lesson.type === 'drag_drop' && lesson.dragDropConfig && (
+            <div className="flex flex-col md:flex-row gap-8 flex-1">
+              {/* Reserva (Pool) */}
+              <div className="flex-1 md:border-r border-gray-800 md:pr-4">
+                <h3 className="text-cyan-400 font-bold mb-4 uppercase text-xs tracking-wider">
+                  Pasos Disponibles
+                </h3>
+                <div className="space-y-3">
+                  {lesson.dragDropConfig.items
+                    .filter((i) => !userSequence.includes(i.id))
+                    .map((item) => {
+                      const correctIndex = lesson.dragDropConfig!.correctSequence.indexOf(item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => addToSequence(item.id)}
+                          className={`w-full p-4 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-xl text-left transition-all active:scale-95 flex justify-between items-center group relative ${isDevMode ? 'pl-10' : ''}`}
+                        >
+                          {isDevMode && correctIndex !== -1 && (
+                            <div className="absolute left-2 top-1/2 -translate-y-1/2 w-6 h-6 bg-purple-500/20 border border-purple-500 text-purple-400 rounded flex items-center justify-center text-xs font-bold">
+                              {correctIndex + 1}
+                            </div>
+                          )}
+                          <span className="font-medium text-gray-200">{item.text}</span>
+                          <MoveRight
+                            size={16}
+                            className="text-gray-500 group-hover:text-cyan-400 transition-colors"
+                          />
+                        </button>
+                      );
+                    })}
+                  {lesson.dragDropConfig.items.filter((i) => !userSequence.includes(i.id))
+                    .length === 0 && (
+                      <div className="text-gray-600 italic text-center py-4 text-sm">
+                        Todo asignado
+                      </div>
+                    )}
+                </div>
+              </div>
+
+              {/* Secuencia */}
+              <div className="flex-1 bg-gray-900/50 rounded-2xl p-6 border-2 border-dashed border-gray-700 min-h-[300px] shadow-inner">
+                <h3 className="text-purple-400 font-bold mb-4 uppercase text-xs tracking-wider flex items-center gap-2">
+                  Tu Algoritmo{' '}
+                  <span className="text-gray-600 text-[10px]">(Orden de ejecución)</span>
+                </h3>
+                <div className="space-y-3">
+                  {userSequence.map((seqId, idx) => {
+                    const item = lesson.dragDropConfig?.items.find((i) => i.id === seqId);
+                    return (
+                      <div
+                        key={seqId}
+                        className="w-full p-4 bg-purple-900/20 border border-purple-500/30 rounded-xl flex justify-between items-center animate-in slide-in-from-left-2 fade-in duration-300"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="bg-purple-900 text-purple-200 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold">
+                            {idx + 1}
+                          </span>
+                          <span className="font-medium text-purple-100">{item?.text}</span>
+                        </div>
+                        <button
+                          onClick={() => removeFromSequence(seqId)}
+                          className="text-gray-400 hover:text-red-400 p-1 hover:bg-red-500/10 rounded-lg transition-colors"
+                        >
+                          <XIcon size={16} />
+                        </button>
+                      </div>
+                    );
+                  })}
+                  {userSequence.length === 0 && (
+                    <div className="text-gray-500 py-10 text-center flex flex-col items-center">
+                      <div className="w-12 h-12 border-2 border-dashed border-gray-700 rounded-full mb-3 flex items-center justify-center text-gray-700">
+                        <MoveRight size={20} />
+                      </div>
+                      <p className="text-sm">
+                        Toca los pasos disponibles
+                        <br />
+                        para añadirlos aquí
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TEORÍA */}
+          {lesson.type === 'theory' && (
+            <div className="flex flex-col gap-6">
+              {lesson.theoryBlocks ? (
+                lesson.theoryBlocks.map((block, idx) => {
+                  switch (block.type) {
+                    case 'text':
+                      return (
+                        <p key={idx} className="text-xl text-gray-200 leading-relaxed font-medium">
+                          {block.content as string}
+                        </p>
+                      );
+                    case 'header':
+                      return (
+                        <h3 key={idx} className="text-2xl font-bold text-cyan-400 mt-4">
+                          {block.content as string}
+                        </h3>
+                      );
+                    case 'list':
+                      return (
+                        <div
+                          key={idx}
+                          className="bg-gray-800/50 p-6 rounded-2xl border border-gray-700"
+                        >
+                          <ul className="space-y-4">
+                            {(block.content as string[]).map((item, itemIdx) => (
+                              <li
+                                key={itemIdx}
+                                className="flex items-center gap-4 text-lg text-gray-300"
+                              >
+                                <span className="bg-cyan-900 text-cyan-400 w-8 h-8 flex items-center justify-center rounded-full font-bold flex-shrink-0">
+                                  {itemIdx + 1}
+                                </span>
+                                {item}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    case 'checklist':
+                      return (
+                        <div
+                          key={idx}
+                          className="bg-gray-800/30 p-6 rounded-2xl border border-gray-700/50"
+                        >
+                          <ul className="space-y-4">
+                            {(block.content as string[]).map((item, itemIdx) => (
+                              <li
+                                key={itemIdx}
+                                className="flex items-center gap-4 text-lg text-gray-200"
+                              >
+                                <CheckCircle size={24} className="text-green-500 flex-shrink-0" />
+                                <span className="font-medium">{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      );
+                    case 'true_false':
+                      const userAnswer = inlineAnswers[idx];
+                      const isCorrect = userAnswer === block.answer;
+                      const hasAnswered = userAnswer !== undefined && userAnswer !== null;
+
+                      return (
+                        <div
+                          key={idx}
+                          className="bg-gradient-to-br from-gray-800 to-gray-900 p-6 rounded-2xl border border-gray-700 my-4 shadow-lg"
+                        >
+                          <p className="text-lg font-bold text-white mb-6">
+                            {block.content as string}
+                          </p>
+
+                          <div className="flex gap-4">
+                            <button
+                              onClick={() => setInlineAnswers({ ...inlineAnswers, [idx]: true })}
+                              disabled={hasAnswered}
+                              className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${hasAnswered && block.answer === true
+                                ? 'bg-green-500/20 text-green-400 border-2 border-green-500'
+                                : hasAnswered && userAnswer === true && !isCorrect
+                                  ? 'bg-red-500/20 text-red-400 border-2 border-red-500'
+                                  : 'bg-gray-700 hover:bg-gray-600 text-gray-300 border-2 border-transparent'
+                                }`}
+                            >
+                              Verdadero
+                            </button>
+                            <button
+                              onClick={() => setInlineAnswers({ ...inlineAnswers, [idx]: false })}
+                              disabled={hasAnswered}
+                              className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${hasAnswered && block.answer === false
+                                ? 'bg-green-500/20 text-green-400 border-2 border-green-500'
+                                : hasAnswered && userAnswer === false && !isCorrect
+                                  ? 'bg-red-500/20 text-red-400 border-2 border-red-500'
+                                  : 'bg-gray-700 hover:bg-gray-600 text-gray-300 border-2 border-transparent'
+                                }`}
+                            >
+                              Falso
+                            </button>
+                          </div>
+
+                          {hasAnswered && (
+                            <div
+                              className={`mt-4 p-3 rounded-lg text-sm font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-1 ${isCorrect ? 'text-green-400 bg-green-900/20' : 'text-red-400 bg-red-900/20'}`}
+                            >
+                              {isCorrect ? <CheckCircle size={16} /> : <XIcon size={16} />}
+                              {isCorrect ? '¡Correcto!' : 'Incorrecto'}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    case 'alert':
+                      return (
+                        <div
+                          key={idx}
+                          className={`p-6 rounded-2xl border-l-8 flex gap-4 ${block.style === 'warning'
+                            ? 'bg-amber-900/20 border-amber-500 text-amber-100'
+                            : 'bg-blue-900/20 border-blue-500 text-blue-100'
+                            }`}
+                        >
+                          <AlertCircle size={32} className="flex-shrink-0" />
+                          <p className="font-bold text-lg">{block.content as string}</p>
+                        </div>
+                      );
+                    default:
+                      return null;
+                  }
+                })
+              ) : (
+                <div className="p-8 bg-gray-800 rounded-xl">
+                  <h3 className="text-xl font-bold mb-4">Teoría</h3>
+                  <p className="text-gray-300 leading-relaxed">{lesson.theoryContent}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pie de acción fijo (Sticky) */}
+      <div
+        className={`fixed bottom-0 left-0 md:left-64 right-0 p-6 border-t backdrop-blur-md transition-colors duration-300 z-40 ${showFeedback === 'success'
+          ? 'bg-green-900/90 border-green-500/50'
+          : showFeedback === 'trap'
+            ? 'bg-amber-900/90 border-amber-500/50'
+            : showFeedback === 'error'
+              ? 'bg-red-900/90 border-red-500/50'
+              : 'bg-[#1e1e1e]/90 border-gray-800'
+          }`}
+      >
+        <div className="max-w-3xl mx-auto flex justify-between items-center">
+          {showFeedback === 'success' && (
+            <div className="flex items-center gap-4 animate-in slide-in-from-bottom-2 duration-300">
+              <div className="bg-green-500/20 p-2 rounded-full">
+                <CheckCircle size={32} className="text-green-400" />
+              </div>
+              <div>
+                <p className="font-bold text-green-100 text-lg">¡Correcto!</p>
+                <p className="text-sm font-normal text-green-300/80">
+                  {lesson.type === 'simulation'
+                    ? lesson.simulationConfig?.successMessage
+                    : lesson.type === 'quiz'
+                      ? lesson.quizConfig?.successMessage
+                      : lesson.type === 'drag_drop'
+                        ? lesson.dragDropConfig?.successMessage
+                        : 'Lección completada. ¡Continúa aprendiendo!'}
+                </p>
+              </div>
+            </div>
+          )}
+          {showFeedback === 'trap' && (
+            <div className="flex items-center gap-4 animate-in slide-in-from-bottom-2 duration-300">
+              <div className="bg-amber-500/20 p-2 rounded-full">
+                <Bot size={32} className="text-amber-400" />
+              </div>
+              <div>
+                <p className="font-bold text-amber-100 text-lg">¡Espera!</p>
+                <p className="text-sm font-normal text-amber-200">
+                  {lesson.dragDropConfig?.trapMessage}
+                </p>
+              </div>
+            </div>
+          )}
+          {showFeedback === 'error' && (
+            <div className="flex items-center gap-4 animate-in slide-in-from-bottom-2 duration-300">
+              <div className="bg-red-500/20 p-2 rounded-full">
+                <RotateCcw size={32} className="text-red-400" />
+              </div>
+              <div>
+                <p className="font-bold text-red-100 text-lg">Inténtalo de nuevo</p>
+                <p className="text-sm font-normal text-red-300/80">
+                  {lesson.type === 'simulation'
+                    ? lesson.simulationConfig?.errorMessage
+                    : lesson.type === 'quiz'
+                      ? lesson.quizConfig?.errorMessage
+                      : lesson.type === 'drag_drop'
+                        ? lesson.dragDropConfig?.errorMessage
+                        : 'Responde correctamente todas las preguntas para continuar.'}
+                </p>
+              </div>
+            </div>
+          )}
+          {!showFeedback && (
+            <div className="text-gray-500 italic hidden sm:block">
+              Completa el ejercicio para continuar...
+            </div>
+          )}
+
+          {/* Dev Mode Navigation */}
+          {isDevMode && (
+            <div className="flex gap-2 mr-2">
+              <button
+                onClick={() => currentIndex > 0 && navigate(`/lessons/${chain[currentIndex - 1]}`)}
+                disabled={currentIndex === 0}
+                className="p-4 rounded-xl bg-gray-800 text-purple-400 border border-purple-500/50 hover:bg-purple-900/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                title="Previous Question (Dev Mode)"
+              >
+                <ChevronLeft size={24} />
+              </button>
+              <button
+                onClick={() =>
+                  currentIndex < chain.length - 1
+                    ? navigate(`/lessons/${chain[currentIndex + 1]}`)
+                    : setShowSummary(true)
+                }
+                className="p-4 rounded-xl bg-gray-800 text-purple-400 border border-purple-500/50 hover:bg-purple-900/20"
+                title="Next Question (Dev Mode)"
+              >
+                <ChevronRight size={24} />
+              </button>
+            </div>
+          )}
+
+          <button
+            onClick={showFeedback ? handleContinue : handleCheck}
+            disabled={
+              !showFeedback && lesson.type !== 'theory' && selectedAnswer === null && userSequence.length === 0
+            }
+            className={`px-8 py-4 rounded-xl font-bold text-lg transition-all transform active:scale-95 shadow-lg flex-1 md:flex-none ${showFeedback === 'success'
+              ? 'bg-green-500 hover:bg-green-400 text-white shadow-green-900/20'
+              : showFeedback === 'trap'
+                ? 'bg-amber-500 hover:bg-amber-400 text-white shadow-amber-900/20'
+                : showFeedback === 'error'
+                  ? 'bg-red-500 hover:bg-red-400 text-white shadow-red-900/20'
+                  : lesson.type !== 'theory' &&
+                    selectedAnswer === null &&
+                    userSequence.length === 0
+                    ? 'bg-gray-800 text-gray-600 cursor-not-allowed shadow-none'
+                    : 'bg-gradient-to-b from-cyan-400 to-cyan-500 hover:from-cyan-300 hover:to-cyan-400 text-cyan-950 shadow-cyan-900/30'
+              }`}
+          >
+            {showFeedback
+              ? (!lesson.nextLessonId ? 'FINALIZAR' : 'CONTINUAR')
+              : lesson.type === 'theory'
+                ? (!lesson.nextLessonId ? 'FINALIZAR' : 'CONTINUAR')
+                : 'COMPROBAR'}
+          </button>
+        </div>
+      </div>
+    </div >
+  );
 }

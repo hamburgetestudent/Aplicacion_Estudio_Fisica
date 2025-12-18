@@ -1,4 +1,4 @@
-import './App.css'
+import './App.css';
 
 import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Layout } from './components/layout/Layout';
@@ -6,19 +6,28 @@ import { Layout } from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Lesson from './pages/Lesson';
 import Profile from './pages/Profile';
+import { DevModeProvider } from './context/DevModeContext';
 
 // Páginas de marcador de posición (Placeholder)
 /**
  * Componente de marcador de posición para el generador de PDF.
  */
-const PDFGenerator = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Generador de PDF</h1><p>Próximamente</p></div>;
+const PDFGenerator = () => (
+  <div className="p-8">
+    <h1 className="text-3xl font-bold mb-4">Generador de PDF</h1>
+    <p>Próximamente</p>
+  </div>
+);
 
 /**
  * Componente de marcador de posición para las estadísticas.
  */
-const Stats = () => <div className="p-8"><h1 className="text-3xl font-bold mb-4">Estadísticas</h1><p>Próximamente</p></div>;
-
-import { DevModeProvider } from './context/DevModeContext';
+const Stats = () => (
+  <div className="p-8">
+    <h1 className="text-3xl font-bold mb-4">Estadísticas</h1>
+    <p>Próximamente</p>
+  </div>
+);
 
 /**
  * Componente principal de la aplicación.
@@ -37,9 +46,9 @@ function App() {
             <Route path="pdf-generator" element={<PDFGenerator />} />
             <Route path="stats" element={<Stats />} />
             <Route path="profile" element={<Profile />} />
-          </Route >
-        </Routes >
-      </HashRouter >
+          </Route>
+        </Routes>
+      </HashRouter>
     </DevModeProvider>
   );
 }

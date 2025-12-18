@@ -1,80 +1,85 @@
-# Herramienta de Estudio de Física (Generador & Quiz)
+# Herramienta de Estudio: Física & Python 🚀
 
-Bienvenido a la herramienta definitiva para estudiantes y profesores de física. Esta aplicación de escritorio combina un potente sistema de **aprendizaje interactivo** con cuestionarios gamificados y un **generador de documentos PDF** para material de estudio.
+¡Bienvenido a la aplicación definitiva para dominar la Física y la Programación! Tras una migración completa, esta herramienta de escritorio ahora funciona sobre una arquitectura moderna basada en **Electron**, **React 19** y **TypeScript**.
 
-Diseñada con una interfaz moderna y oscura (`CustomTkinter`), es ideal para practicar fórmulas, ponerse a prueba y crear hojas de fórmulas para exámenes.
+La aplicación combina un sistema de **aprendizaje interactivo** con cuestionarios gamificados, simulaciones en tiempo real y un potente **generador de documentos PDF**.
 
-## Características Principales
+---
 
-### 1. 🎓 Modo Estudio y Cuestionarios (Quiz)
-La función principal de la aplicación es ayudarte a dominar la física.
-*   **Aprendizaje de Fórmulas:** Relaciona conceptos físicos con su fórmula matemática correcta (renderizada en LaTeX).
-*   **Banco de Preguntas:** Practica con preguntas de selección múltiple sobre teoría y aplicación.
-*   **Niveles de Dificultad:** Elige entre Fácil, Medio y Difícil para adaptar el reto a tu nivel.
-*   **Feedback Inmediato:** Aprende de tus errores con correcciones visuales instantáneas.
+## ✨ Características Principales
+
+### 1. 🎓 Aprendizaje Interactivo
+No solo leas, ¡interactúa! Hemos diseñado diferentes tipos de lecciones para asegurar el aprendizaje:
+*   **Simulaciones Dinámicas:** Modifica variables físicas y observa resultados instantáneos (ej: lanzamiento de cohetes, caída libre).
+*   **Sequence Builder (Arrastrar y Soltar):** Aprende la lógica detrás de los algoritmos y procesos físicos ordenando pasos.
+*   **Teoría Enriquecida:** Contenido teórico interactivo con alertas, listas de verificación y micro-quices.
 
 ### 2. 🏆 Sistema de Gamificación
-¡Haz que estudiar sea divertido! La aplicación rastrea tu progreso localmente.
-*   **Experiencia (XP):** Gana **10 XP** por cada respuesta correcta.
-*   **Niveles:** Sube de nivel cada **100 XP** acumulados.
-*   **Rachas:** Mantén una racha de aciertos para demostrar tu dominio.
-*   **Logros:** Desbloquea medallas como *"Primer Paso"*, *"Estudioso"*, *"Maestro"* y *"En Llamas"*.
+Estudiar es más divertido cuando progresas y desbloqueas logros:
+*   **Progreso de Usuario:** Gana XP con cada lección completada y sube de nivel.
+*   **Logros y Medallas:** Desbloquea reconocimientos como *"Primer Paso"*, *"Estudioso"*, *"Maestro"* y mucho más.
+*   **Dashboard de Usuario:** Visualiza tu nivel, racha de estudio y progreso global por categorías.
 
 ### 3. 📄 Generador de PDF
-Crea documentos profesionales con tablas de fórmulas listas para imprimir.
-*   **Entrada Flexible:** Copia y pega desde Excel/CSV o escribe en Markdown.
-*   **Renderizado LaTeX:** Las fórmulas se convierten automáticamente en imágenes nítidas de alta calidad.
-*   **Portabilidad:** Genera un archivo PDF estructurado en segundos.
+Crea hojas de estudio profesionales y formularios en segundos:
+*   **Formato Flexible:** Soporta entrada de texto y tablas en Markdown.
+*   **Renderizado LaTeX:** Las fórmulas matemáticas se ven perfectas gracias a la integración con KaTeX.
+*   **Exportación Directa:** Genera PDFs listos para imprimir o compartir.
 
 ---
 
-## Instalación
+## 🛠️ Tecnologías Utilizadas
 
-1.  **Requisitos:** Python 3.8 o superior.
-2.  **Instalar dependencias:**
-    ```bash
-    pip install -r requirements.txt
-    ```
-3.  **Ejecutar:**
-    ```bash
-    python main.py
-    ```
+*   **Core:** React 19, TypeScript, Electron.
+*   **Estilos:** Tailwind CSS (moderno, oscuro y refinado).
+*   **Iconos:** Lucide React.
+*   **Matemáticas:** KaTeX para un renderizado impecable de fórmulas.
+*   **Build Tool:** Vite.
 
 ---
 
-## Guía de Uso
+## 🚀 Instalación y Desarrollo
 
-### Modo Cuestionario (Quiz)
-1.  En el menú lateral, selecciona **"Quiz / Cuestionario"**.
-2.  Navega por las categorías (ej: *Física Clásica* -> *Cinemática*).
-3.  Elige tu modo de práctica:
-    *   **Aprender Fórmulas:** Identifica la ecuación visual.
-    *   **Responder Preguntas:** Resuelve problemas teóricos.
-4.  (Opcional) Selecciona la dificultad.
-5.  ¡Responde y sube de nivel! Tu progreso se guarda automáticamente.
+### Requisitos
+*   [Node.js](https://nodejs.org/) (Versión recomendada: 18 o superior).
 
-### Generador de PDF
-1.  En el menú lateral, selecciona **"Generador PDF"**.
-2.  Ingresa tus datos en el área de texto. Se recomienda el formato Markdown:
-    ```markdown
-    ### Dinámica
-    | Concepto | Fórmula | Notas |
-    |---|---|---|
-    | Fuerza | F = m * a | Segunda Ley de Newton |
-    ```
-3.  Haz clic en **"Generar PDF"** y guarda tu archivo.
+### Configuración del Proyecto
+1. Clona el repositorio.
+2. Navega al directorio de la aplicación:
+   ```bash
+   cd desktop-app
+   ```
+3. Instala las dependencias:
+   ```bash
+   npm install
+   ```
+
+### Ejecución en Desarrollo
+Para iniciar la aplicación con Hot Module Replacement (HMR):
+```bash
+npm run dev
+```
+
+### Construcción para Producción
+Para empaquetar la aplicación para tu sistema operativo:
+```bash
+npm run build
+```
 
 ---
 
-## Estructura del Proyecto
+## 📂 Estructura del Proyecto
 
-*   `src/views/`: Contiene las interfaces gráficas (Home, Quiz, PDF).
-*   `src/gamification.py`: Lógica del sistema de progreso y logros.
-*   `data/`: Almacena la base de datos de preguntas (`quiz_db.json`) y tu progreso (`user_progress.json`).
-*   `pdf_builder.py` & `renderer.py`: Motores de generación de documentos e imágenes matemáticas.
+*   `desktop-app/src/pages/`: Vistas principales (Dashboard, Lecciones, Perfil).
+*   `desktop-app/src/components/`: Componentes modulares de la interfaz.
+*   `desktop-app/src/lib/`: Lógica de negocio (Gamificación, Lecciones, Datos de Quiz).
+*   `desktop-app/electron/`: Configuración principal de la ventana de escritorio.
 
-## Contribución
-Si deseas contribuir, por favor revisa el archivo `ROADMAP.md` para ver las tareas pendientes y prioridades.
+---
 
-## Licencia
+## 🤝 Contribución
+Las contribuciones son bienvenidas. Si tienes ideas para nuevas simulaciones o módulos de estudio, por favor abre un *Issue* o envía un *Pull Request*.
+
+## 📜 Licencia
 Todos los derechos reservados.
+

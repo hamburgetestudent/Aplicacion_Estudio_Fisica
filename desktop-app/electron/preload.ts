@@ -5,5 +5,5 @@ import { contextBridge } from 'electron';
  * Utiliza contextBridge para asegurar el aislamiento de contexto.
  */
 contextBridge.exposeInMainWorld('electron', {
-    // Agregar APIs de comunicación con el backend aquí
+  // Agregar APIs de comunicación con el backend aquí
 });
