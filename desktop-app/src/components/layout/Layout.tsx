@@ -3,6 +3,7 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { useDevMode } from '../../context/DevModeContext';
 import { DebugDashboard } from '../debug/DebugDashboard';
+import { BackgroundMusic } from './BackgroundMusic';
 import { Settings } from 'lucide-react';
 import { useState } from 'react';
 
@@ -19,6 +20,7 @@ export function Layout() {
 
   return (
     <div className="min-h-screen bg-gray-950 text-white font-sans selection:bg-cyan-500/30">
+      <BackgroundMusic />
       <Sidebar />
       <div className="md:ml-64 h-screen flex flex-col relative overflow-hidden">
         <TopBar />

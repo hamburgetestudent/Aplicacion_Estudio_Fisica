@@ -19,6 +19,7 @@ import { useDevMode } from '../context/DevModeContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LESSONS_DATA } from '../lib/lessons';
 import SnakeCelebration from '../components/SnakeCelebration';
+import AlgorithmRepair from '../components/minigames/AlgorithmRepair';
 
 // Ayudante para efectos de confeti
 const Confetti = () => (
@@ -582,7 +583,7 @@ export default function Lesson() {
           {/* SIMULACIÓN */}
           {lesson.type === 'simulation' &&
             lesson.simulationConfig &&
-            !['boolean_playground', 'message_send'].includes(lesson.simulationConfig.type) && (
+            !['boolean_playground', 'message_send', 'algorithm_repair'].includes(lesson.simulationConfig.type) && (
               <>
                 <div className="bg-gray-800 rounded-xl p-8 h-64 flex items-end justify-center relative overflow-hidden border border-gray-700 shadow-inner">
                   <div
@@ -682,6 +683,13 @@ export default function Lesson() {
               </>
             )}
 
+
+          {/* ALGORITHM REPAIR MINIGAME */}
+          {lesson.type === 'simulation' && lesson.simulationConfig?.type === 'algorithm_repair' && (
+            <div className="flex justify-center items-center min-h-[500px]">
+              <AlgorithmRepair onComplete={() => setShowFeedback('success')} />
+            </div>
+          )}
 
           {/* BOOLEAN PLAYGROUND SIMULATION */}
           {lesson.type === 'simulation' && lesson.simulationConfig?.type === 'boolean_playground' && (
@@ -981,7 +989,6 @@ export default function Lesson() {
                           <div className="flex gap-4">
                             <button
                               onClick={() => setInlineAnswers({ ...inlineAnswers, [idx]: true })}
-                              disabled={hasAnswered}
                               className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${hasAnswered && block.answer === true
                                 ? 'bg-green-500/20 text-green-400 border-2 border-green-500'
                                 : hasAnswered && userAnswer === true && !isCorrect
@@ -989,11 +996,10 @@ export default function Lesson() {
                                   : 'bg-gray-700 hover:bg-gray-600 text-gray-300 border-2 border-transparent'
                                 }`}
                             >
-                              Verdadero
+                              {block.trueLabel || 'Verdadero'}
                             </button>
                             <button
                               onClick={() => setInlineAnswers({ ...inlineAnswers, [idx]: false })}
-                              disabled={hasAnswered}
                               className={`flex-1 py-3 px-4 rounded-xl font-bold transition-all ${hasAnswered && block.answer === false
                                 ? 'bg-green-500/20 text-green-400 border-2 border-green-500'
                                 : hasAnswered && userAnswer === false && !isCorrect
@@ -1001,7 +1007,7 @@ export default function Lesson() {
                                   : 'bg-gray-700 hover:bg-gray-600 text-gray-300 border-2 border-transparent'
                                 }`}
                             >
-                              Falso
+                              {block.falseLabel || 'Falso'}
                             </button>
                           </div>
 
@@ -1026,6 +1032,23 @@ export default function Lesson() {
                         >
                           <AlertCircle size={32} className="flex-shrink-0" />
                           <p className="font-bold text-lg">{block.content as string}</p>
+                        </div>
+                      );
+                    case 'image':
+                      return (
+                        <div key={idx} className="flex flex-col items-center gap-4 my-6">
+                          <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-gray-700 w-full max-w-2xl bg-gray-900/50">
+                            <img
+                              src={block.content as string}
+                              alt={block.caption || 'Lesson Image'}
+                              className="w-full h-auto object-contain"
+                            />
+                          </div>
+                          {block.caption && (
+                            <p className="text-gray-400 text-sm italic border-l-2 border-cyan-500 pl-3">
+                              {block.caption}
+                            </p>
+                          )}
                         </div>
                       );
                     default:

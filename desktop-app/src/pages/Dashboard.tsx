@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { BookOpen, Lock, CheckCircle, Star, Zap, Code } from 'lucide-react';
+import { BookOpen, Lock, CheckCircle, Star, Zap, Code, Heart } from 'lucide-react';
 import { QUIZ_DATA } from '../lib/quiz-data';
 import { useNavigate } from 'react-router-dom';
 
@@ -139,10 +139,10 @@ export default function Dashboard() {
             key={subject}
             onClick={() => setSelectedSubject(subject)}
             className={`px-6 py-2 rounded-full text-sm font-bold transition-all flex items-center gap-2 ${selectedSubject === subject
-                ? subject === 'Python'
-                  ? 'bg-yellow-500 text-yellow-950 shadow-lg shadow-yellow-500/20'
-                  : 'bg-cyan-500 text-cyan-950 shadow-lg shadow-cyan-500/20'
-                : 'text-gray-400 hover:text-white hover:bg-white/5'
+              ? subject === 'Python'
+                ? 'bg-yellow-500 text-yellow-950 shadow-lg shadow-yellow-500/20'
+                : 'bg-cyan-500 text-cyan-950 shadow-lg shadow-cyan-500/20'
+              : 'text-gray-400 hover:text-white hover:bg-white/5'
               }`}
           >
             {subject === 'Física' ? (
@@ -253,7 +253,13 @@ export default function Dashboard() {
                       )}
 
                       <button
-                        onClick={() => !lesson.locked && navigate(`/lessons/${lesson.id}`)}
+                        onClick={() => {
+                          if (!lesson.locked) {
+                            const audio = new Audio('/sounds/keyboard_click.mp3');
+                            audio.play().catch((e) => console.error('Audio play failed', e));
+                            navigate(`/lessons/${lesson.id}`);
+                          }
+                        }}
                         disabled={lesson.locked}
                         className={`
                                                     relative w-20 h-20 rounded-[2rem] flex items-center justify-center text-3xl font-bold border-b-8 transition-all
@@ -272,6 +278,8 @@ export default function Dashboard() {
                           <CheckCircle size={32} strokeWidth={3} />
                         ) : lesson.locked ? (
                           <Lock size={28} />
+                        ) : lesson.topic === 'Salud mental' ? (
+                          <Heart size={32} fill="currentColor" className="text-red-400" />
                         ) : (
                           <Star size={32} fill="currentColor" />
                         )}

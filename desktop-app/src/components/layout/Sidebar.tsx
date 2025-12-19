@@ -1,7 +1,8 @@
 import { NavLink } from 'react-router-dom';
-import { BookOpen, Trophy, Zap, User, Terminal } from 'lucide-react';
+import { BookOpen, Trophy, Zap, User, Terminal, Gamepad2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { useDevMode } from '../../context/DevModeContext';
 
 /**
  * Función de utilidad para combinar clases de Tailwind de manera condicional y segura.
@@ -20,11 +21,14 @@ function cn(...inputs: (string | undefined | null | false)[]) {
  * @returns {JSX.Element} La barra lateral de navegación.
  */
 export function Sidebar() {
+  const { isDevMode } = useDevMode();
+
   const navItems = [
     { icon: BookOpen, label: 'Inicio', to: '/' },
     { icon: Trophy, label: 'Clasificación', to: '/leaderboard' },
     { icon: Zap, label: 'Desafíos', to: '/quests' },
     { icon: User, label: 'Perfil', to: '/profile' },
+    ...(isDevMode ? [{ icon: Gamepad2, label: 'Desarrollo', to: '/dev' }] : []),
   ];
 
   return (
@@ -56,13 +60,7 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="p-4 bg-gray-800 rounded-xl border border-gray-700">
-        <h3 className="text-sm text-gray-400 mb-2">Misión Diaria</h3>
-        <div className="w-full bg-gray-700 h-2 rounded-full overflow-hidden">
-          <div className="bg-cyan-400 h-full w-3/4"></div>
-        </div>
-        <p className="text-xs text-right text-cyan-400 mt-1">3/4 Lecciones</p>
-      </div>
+
     </div>
   );
 }

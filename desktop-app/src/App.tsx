@@ -6,6 +6,7 @@ import { Layout } from './components/layout/Layout';
 import Dashboard from './pages/Dashboard';
 import Lesson from './pages/Lesson';
 import Profile from './pages/Profile';
+import Development from './pages/Development';
 import { DevModeProvider } from './context/DevModeContext';
 
 // Páginas de marcador de posición (Placeholder)
@@ -46,6 +47,7 @@ function App() {
             <Route path="pdf-generator" element={<PDFGenerator />} />
             <Route path="stats" element={<Stats />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="dev" element={<Development />} />
           </Route>
         </Routes>
       </HashRouter>

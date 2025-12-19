@@ -16,6 +16,7 @@
   "dependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "clsx": "^2.1.1",
+    "framer-motion": "^12.23.26",
     "katex": "^0.16.27",
     "lucide-react": "^0.560.0",
     "react": "^19.2.0",

@@ -76,18 +76,21 @@ export const QUIZ_DATA: QuizData = {
     },
   },
   Python: {
-    Estructuras: {
-      Listas: {
-        formulas: [],
-        questions: [],
-      },
-    },
+
     Fundamentos: {
       Algoritmos: {
         formulas: [],
         questions: [],
       },
       PensarEnPasos: {
+        formulas: [],
+        questions: [],
+      },
+      'Salud mental': {
+        formulas: [],
+        questions: [],
+      },
+      'Introducción al Pseudocódigo': {
         formulas: [],
         questions: [],
       },
