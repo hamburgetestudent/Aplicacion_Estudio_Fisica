@@ -15,7 +15,7 @@ No solo leas, ¡interactúa! Hemos diseñado diferentes tipos de lecciones para 
 *   **Teoría Enriquecida:** Contenido teórico interactivo con alertas, listas de verificación y micro-quices.
 
 ### 2. 🏆 Sistema de Gamificación
-Estudiar es más divertido cuando progresas y desbloqueas logros:
+Estudiar es más divertido cuando progresas y desbloqueas logros, inspirado en aplicaciones de estudio corto y rapido:
 *   **Progreso de Usuario:** Gana XP con cada lección completada y sube de nivel.
 *   **Logros y Medallas:** Desbloquea reconocimientos como *"Primer Paso"*, *"Estudioso"*, *"Maestro"* y mucho más.
 *   **Dashboard de Usuario:** Visualiza tu nivel, racha de estudio y progreso global por categorías.
